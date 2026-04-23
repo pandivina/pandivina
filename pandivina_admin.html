@@ -539,9 +539,11 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <div class="panel" id="panel-productos">
   <div class="info">✨ Los productos marcados como <strong>visibles</strong> aparecen en tu web pública. Al sincronizar con SumUp, se actualizan automáticamente en tu catálogo de la TPV.</div>
   <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-    <button class="btn btn-gn" onclick="syncSumUp()">🔄 Sincronizar con SumUp</button>
+    <button class="btn btn-gn" onclick="importFromSumUp()">⬇ Importar desde SumUp</button>
+    <button class="btn btn-gn" onclick="syncSumUp()">🔄 Sincronizar a SumUp</button>
     <button class="btn btn-o" onclick="addProduct()">+ Añadir producto</button>
   </div>
+  <div id="importMsg" style="display:none;font-size:12px;color:var(--txd);margin-bottom:10px"></div>
   <div class="card">
     <div class="card-hdr"><span>Catálogo de productos</span><span id="prodCount" style="color:var(--txd)"></span></div>
     <div style="overflow-x:auto;padding-bottom:4px">
@@ -1006,6 +1008,62 @@ function renderProducts(){
 function addProduct(){products.push({id:Date.now(),name:'',category:'',price:0,emoji:'🌸',desc:'',visible:true});renderProducts();}
 
 // ══ SUMUP SYNC ════════════════════════════════════════════
+async function importFromSumUp(){
+  const token = getSumUpToken() || localStorage.getItem('pd_su_key') || SU_KEY_DEFAULT;
+  const merchant = localStorage.getItem('pd_su_merchant') || SU_MERCHANT_DEFAULT;
+  if(!token){ toast('⚙ Conecta SumUp primero en Ajustes'); return; }
+
+  const msg = el('importMsg');
+  if(msg){ msg.style.display='block'; msg.textContent='⏳ Importando productos desde SumUp…'; }
+
+  try {
+    // Fetch products from SumUp catalog
+    const r = await fetch('/api/sumup?path='+encodeURIComponent('/v0.1/merchants/'+merchant+'/products')+'&key='+encodeURIComponent(token));
+    if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||r.status); }
+    const data = await r.json();
+
+    // SumUp returns { products: [...] } or array directly
+    const suProducts = data.products || data.items || (Array.isArray(data)?data:[]);
+    if(!suProducts.length){
+      if(msg) msg.textContent = 'No se encontraron productos en SumUp';
+      return;
+    }
+
+    let added=0, updated=0;
+    suProducts.forEach(sp => {
+      // Match by name (case insensitive)
+      const existing = products.find(p => p.name.toLowerCase() === (sp.name||'').toLowerCase());
+      if(existing){
+        // Update price if changed
+        const newPrice = parseFloat(sp.price?.minor_units ? sp.price.minor_units/100 : sp.price) || existing.price;
+        if(existing.price !== newPrice){ existing.price = newPrice; updated++; }
+      } else {
+        // Add new product
+        products.push({
+          id: Date.now()+Math.random(),
+          name: sp.name || '',
+          category: sp.category?.name || sp.shelf_name || '',
+          price: parseFloat(sp.price?.minor_units ? sp.price.minor_units/100 : sp.price) || 0,
+          emoji: '🌸',
+          desc: sp.description || '',
+          visible: true,
+          stock: sp.stock_keeping_unit || ''
+        });
+        added++;
+      }
+    });
+
+    autoSave();
+    renderProducts();
+    if(msg) msg.textContent = `✓ ${added} productos añadidos, ${updated} actualizados desde SumUp`;
+    toast(`✓ Importados ${added} nuevos, ${updated} actualizados`);
+  } catch(e) {
+    if(msg) msg.textContent = '❌ Error: '+e.message;
+    toast('❌ Error importando: '+e.message);
+    console.error(e);
+  }
+}
+
 async function syncSumUp(){
   const apiKey=getSumUpToken()||localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
   const merchant=localStorage.getItem('pd_su_merchant')||SU_MERCHANT_DEFAULT;
