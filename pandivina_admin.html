@@ -678,6 +678,9 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 
 <script>
 // ══ SUPABASE CONFIG ═════════════════════════════════════
+// ══ SUMUP CONFIG ═════════════════════════════════════════
+const SU_KEY_DEFAULT = 'sup_sk_rI3TUuYJ8Y2K3s6QugFToSv4PdMnvzkbm';
+const SU_MERCHANT_DEFAULT = 'MC3QYTSL';
 const SB_URL = 'https://lvafuciikfaavtigcxif.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2YWZ1Y2lpa2ZhYXZ0aWdjeGlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3OTM0MTQsImV4cCI6MjA5MjM2OTQxNH0.y6chuKr42aSffuuc_u7loHJ_z0QbkNltF3X-xtxbSjg';
 
@@ -984,8 +987,8 @@ function addProduct(){products.push({id:Date.now(),name:'',category:'',price:0,e
 
 // ══ SUMUP SYNC ════════════════════════════════════════════
 async function syncSumUp(){
-  const apiKey=localStorage.getItem('pd_su_key')||'';
-  const merchant=localStorage.getItem('pd_su_merchant')||'';
+  const apiKey=localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
+  const merchant=localStorage.getItem('pd_su_merchant')||SU_MERCHANT_DEFAULT;
   if(!apiKey||!merchant){toast('⚙ Configura las credenciales de SumUp en Ajustes');return;}
   toast('🔄 Sincronizando con SumUp…');
   const visible=products.filter(p=>p.visible);
@@ -1343,6 +1346,9 @@ function init(){
   // Pre-fill Supabase credentials
   if(!localStorage.getItem('pd_sb_url')) localStorage.setItem('pd_sb_url', SB_URL);
   if(!localStorage.getItem('pd_sb_key')) localStorage.setItem('pd_sb_key', SB_KEY);
+  // Pre-fill SumUp credentials
+  if(!localStorage.getItem('pd_su_key')) localStorage.setItem('pd_su_key', 'sup_sk_rI3TUuYJ8Y2K3s6QugFToSv4PdMnvzkbm');
+  if(!localStorage.getItem('pd_su_merchant')) localStorage.setItem('pd_su_merchant', 'MC3QYTSL');
   // Try to load from Supabase on startup
   loadFromSupabase();
   window._pendingInit = false;
@@ -1383,7 +1389,7 @@ function getVentasDates(){
 }
 
 async function fetchVentas(){
-  const apiKey = localStorage.getItem('pd_su_key')||'';
+  const apiKey = localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
   if(!apiKey){ toast('⚙ Configura la API Key de SumUp en Ajustes'); return; }
   const dates = getVentasDates();
   if(!dates) return;
@@ -1395,7 +1401,7 @@ async function fetchVentas(){
     // SumUp transactions endpoint
     // Use /api/sumup proxy to avoid CORS issues
     // v2.1 endpoint requires merchant code in path
-    const merchant = localStorage.getItem('pd_su_merchant')||'';
+    const merchant = localStorage.getItem('pd_su_merchant')||SU_MERCHANT_DEFAULT;
     if(!merchant){ toast('⚙ Introduce también el Merchant Code en Ajustes'); return; }
     // Build URL manually to handle statuses[] correctly
     const qs = 'path='+encodeURIComponent('/v0.1/me/transactions/history')
