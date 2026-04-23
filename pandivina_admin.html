@@ -651,12 +651,24 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
   <div class="card">
     <div class="card-hdr">Conexión SumUp</div>
-    <div style="padding:18px;display:flex;flex-direction:column;gap:12px;max-width:520px">
-      <div class="info">Introduce tu API Key de SumUp para sincronizar el catálogo de productos automáticamente.</div>
-      <div><div class="slbl">SumUp API Key</div><input type="text" class="fib" id="suKey" placeholder="sup_sk_..."></div>
-      <div><div class="slbl">Merchant code (tu código de comerciante)</div><input type="text" class="fib" id="suMerchant" placeholder="MX00000000"></div>
-      <button class="btn btn-gn" onclick="saveSumUp()" style="align-self:flex-start">Guardar credenciales SumUp</button>
-      <div id="suMsg" style="font-size:12px;color:var(--txd)"></div>
+    <div style="padding:20px;max-width:520px">
+      <div id="suStatus" style="margin-bottom:16px"></div>
+      <div id="suConnectArea">
+        <div class="info" style="margin-bottom:16px">Conecta tu cuenta de SumUp para sincronizar productos y ver el historial de ventas directamente en Pandivina.</div>
+        <button class="btn btn-gn" id="btnSuConnect" style="display:flex;align-items:center;gap:10px;font-size:14px;padding:12px 24px">
+          <span style="font-size:20px">🔗</span> Conectar con SumUp
+        </button>
+      </div>
+      <div id="suConnectedArea" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--gnd);border:1px solid var(--gn);border-radius:8px;margin-bottom:16px">
+          <span style="font-size:20px">✅</span>
+          <div>
+            <div style="font-weight:600;color:var(--gn);font-size:14px">SumUp conectado</div>
+            <div style="font-size:12px;color:var(--txd)" id="suTokenExpiry"></div>
+          </div>
+          <button class="btn btn-o" onclick="disconnectSumUp()" style="margin-left:auto;font-size:12px;color:var(--rd)">Desconectar</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -679,6 +691,9 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <script>
 // ══ SUPABASE CONFIG ═════════════════════════════════════
 // ══ SUMUP CONFIG ═════════════════════════════════════════
+const OAUTH_CLIENT_ID = 'cc_classic_AOwKinAj4GdwrTpL4wD2fE6W036si';
+const OAUTH_SCOPES    = 'transactions.history user.profile_readonly products';
+const OAUTH_REDIRECT  = 'https://pandivina.vercel.app/api/oauth-callback';
 const SU_KEY_DEFAULT = 'sup_sk_rI3TUuYJ8Y2K3s6QugFToSv4PdMnvzkbm';
 const SU_MERCHANT_DEFAULT = 'MC3QYTSL';
 const SB_URL = 'https://lvafuciikfaavtigcxif.supabase.co';
@@ -798,7 +813,7 @@ function goTab(id,btn){
     const sum=localStorage.getItem('pd_su_merchant')||'';
     const wa=localStorage.getItem('pd_wa')||'';
     el('sbUrl').value=su; el('sbKey').value=sk;
-    el('suKey').value=suk; el('suMerchant').value=sum;
+    updateSumUpStatus();
     el('waNum').value=wa;
   }
 }
@@ -987,7 +1002,7 @@ function addProduct(){products.push({id:Date.now(),name:'',category:'',price:0,e
 
 // ══ SUMUP SYNC ════════════════════════════════════════════
 async function syncSumUp(){
-  const apiKey=localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
+  const apiKey=getSumUpToken()||localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
   const merchant=localStorage.getItem('pd_su_merchant')||SU_MERCHANT_DEFAULT;
   if(!apiKey||!merchant){toast('⚙ Configura las credenciales de SumUp en Ajustes');return;}
   toast('🔄 Sincronizando con SumUp…');
@@ -1113,7 +1128,79 @@ function updateSyncStatus(status){
   else if(status==='syncing'){dot.className='sync-dot syncing';lbl.textContent='Sincronizando…';}
   else{dot.className='sync-dot offline';lbl.textContent='Local';}
 }
-function saveSumUp(){localStorage.setItem('pd_su_key',el('suKey').value.trim());localStorage.setItem('pd_su_merchant',el('suMerchant').value.trim());el('suMsg').textContent='✓ Guardado';el('suMsg').style.color='var(--gn)';}
+// ══ OAUTH SUMUP ══════════════════════════════════════════
+function connectSumUp() {
+  const authUrl = 'https://api.sumup.com/authorize'
+    + '?response_type=code'
+    + '&client_id=' + encodeURIComponent(OAUTH_CLIENT_ID)
+    + '&redirect_uri=' + encodeURIComponent(OAUTH_REDIRECT)
+    + '&scope=' + encodeURIComponent(OAUTH_SCOPES);
+  window.open(authUrl, 'sumup_auth', 'width=600,height=700,scrollbars=yes');
+}
+
+function saveSumUpToken(data) {
+  localStorage.setItem('pd_su_token', data.access_token);
+  localStorage.setItem('pd_su_refresh', data.refresh_token || '');
+  localStorage.setItem('pd_su_expires', data.expires_at || '');
+  updateSumUpStatus();
+  toast('✅ SumUp conectado correctamente');
+}
+
+function getSumUpToken() {
+  const token   = localStorage.getItem('pd_su_token') || '';
+  const expires = parseInt(localStorage.getItem('pd_su_expires') || '0');
+  if (!token) return null;
+  if (expires && Date.now() > expires) return null; // expired
+  return token;
+}
+
+function disconnectSumUp() {
+  if (!confirm('¿Desconectar SumUp?')) return;
+  localStorage.removeItem('pd_su_token');
+  localStorage.removeItem('pd_su_refresh');
+  localStorage.removeItem('pd_su_expires');
+  updateSumUpStatus();
+  toast('SumUp desconectado');
+}
+
+function updateSumUpStatus() {
+  const token   = localStorage.getItem('pd_su_token') || '';
+  const expires = parseInt(localStorage.getItem('pd_su_expires') || '0');
+  const conn    = el('suConnectedArea');
+  const disconn = el('suConnectArea');
+  const expEl   = el('suTokenExpiry');
+  if (!conn || !disconn) return;
+  if (token) {
+    conn.style.display = 'block';
+    disconn.style.display = 'none';
+    if (expEl && expires) {
+      const d = new Date(expires);
+      expEl.textContent = 'Token válido hasta ' + d.toLocaleString('es-ES');
+    }
+  } else {
+    conn.style.display = 'none';
+    disconn.style.display = 'block';
+  }
+}
+
+// Listen for token from OAuth popup
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'SUMUP_TOKEN') {
+    saveSumUpToken(e.data.data);
+  }
+});
+
+// Handle hash redirect fallback
+(function() {
+  if (window.location.hash.includes('sumup=')) {
+    try {
+      const raw = decodeURIComponent(window.location.hash.split('sumup=')[1]);
+      const data = JSON.parse(raw);
+      saveSumUpToken(data);
+      history.replaceState(null, '', window.location.pathname);
+    } catch(e) {}
+  }
+})();
 function saveWA(){localStorage.setItem('pd_wa',el('waNum').value.trim());toast('WhatsApp guardado ✓');}
 
 // ══ INVENTORY ════════════════════════════════════════════
@@ -1389,7 +1476,7 @@ function getVentasDates(){
 }
 
 async function fetchVentas(){
-  const apiKey = localStorage.getItem('pd_su_key')||SU_KEY_DEFAULT;
+  const apiKey = getSumUpToken() || localStorage.getItem('pd_su_key') || SU_KEY_DEFAULT;
   if(!apiKey){ toast('⚙ Configura la API Key de SumUp en Ajustes'); return; }
   const dates = getVentasDates();
   if(!dates) return;
@@ -1552,6 +1639,7 @@ document.querySelector('[data-action="theme"]')?.addEventListener('click', openT
 document.querySelector('[data-action="save"]')?.addEventListener('click', saveAll);
 document.querySelector('[data-action="logout"]')?.addEventListener('click', logout);
 document.querySelector('[data-action="login"]')?.addEventListener('click', doLogin);
+document.getElementById('btnSuConnect')?.addEventListener('click', connectSumUp);
 // Drawer actions
 document.querySelectorAll('[data-action="close-drawer"]').forEach(el=>el.addEventListener('click', closeEscDrawer));
 document.querySelector('[data-action="save-close"]')?.addEventListener('click', ()=>{saveAll();closeEscDrawer();renderRecetas();});
