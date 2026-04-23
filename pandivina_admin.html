@@ -778,16 +778,21 @@ const fpw=()=>fpd()*(cfg.diasSem||6);
 // ══ TABS ════════════════════════════════════════════════
 // ── DRAWER ────────────────────────────────────────────────
 function openEscDrawer(dishId, isNew){
-  if(dishId) { activeDish=dishId; }
+  // Set active dish - ensure numeric comparison
+  if(dishId !== undefined && dishId !== null) {
+    activeDish = typeof dishId === 'string' ? parseInt(dishId) : dishId;
+  }
+  // Open drawer first so DOM elements exist
+  el('escDrawer').classList.add('open');
+  el('escBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Then render into it
   renderSel();
   renderDish();
   recalc();
   const title = isNew ? 'Nueva receta' : (getActive()?.name || 'Editar receta');
   setEl('drawerTitle', title);
-  el('escDrawer').classList.add('open');
-  el('escBackdrop').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  setTimeout(()=>{ if(isNew) el('dishName')?.focus(); }, 350);
+  setTimeout(()=>{ if(isNew) el('dishName')?.focus(); }, 100);
 }
 function closeEscDrawer(){
   el('escDrawer').classList.remove('open');
