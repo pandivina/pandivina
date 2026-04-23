@@ -1404,12 +1404,15 @@ async function fetchVentas(){
   try {
     // SumUp transactions endpoint
     // Use /api/sumup proxy to avoid CORS issues
+    // v2.1 endpoint requires merchant code in path
+    const merchant = localStorage.getItem('pd_su_merchant')||'';
+    if(!merchant){ toast('⚙ Introduce también el Merchant Code en Ajustes'); return; }
     const params = new URLSearchParams({
-      path: '/v0.1/me/transactions/history',
+      path: '/v2.1/merchants/'+merchant+'/transactions/history',
       oldest_time: dates.from,
       newest_time: dates.to,
       limit: '100',
-      'statuses[]': 'SUCCESSFUL'
+      statuses: 'SUCCESSFUL'
     });
     const url = '/api/sumup?'+params.toString();
 
@@ -1424,7 +1427,8 @@ async function fetchVentas(){
     }
 
     const data = await r.json();
-    const items = data.items || [];
+    // v2.1 may return items or transactions array
+    const items = data.items || data.transactions || [];
     renderVentas(items);
     toast(`✓ ${items.length} transacciones cargadas`);
   } catch(e) {
