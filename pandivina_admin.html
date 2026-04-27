@@ -1177,7 +1177,11 @@ let proveedores = JSON.parse(localStorage.getItem('pd_proveedores')||'null') || 
 let clientes = JSON.parse(localStorage.getItem('pd_clientes')||'null') || [];
 let clienteEditId = null;
 let fechasExtra = [];
-let finanzasData = JSON.parse(localStorage.getItem('pd_finanzas')||'null') || {};
+let finanzasData = JSON.parse(localStorage.getItem('pd_finanzas')||'null') || {"2026-01": {"ventas": [{"dia": 1, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 2, "ef": 4.0, "su": 83.0, "on": 0.0, "biz": 60.0}, {"dia": 3, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 15.0}, {"dia": 4, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 5, "ef": 99.03, "su": 5.5, "on": 0.0, "biz": 110.0}, {"dia": 6, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 7, "ef": 40.0, "su": 12.25, "on": 0.0, "biz": 20.0}, {"dia": 8, "ef": 18.0, "su": 100.0, "on": 0.0, "biz": 0.0}, {"dia": 9, "ef": 0.0, "su": 131.0, "on": 0.0, "biz": 0.0}, {"dia": 10, "ef": 68.65, "su": 57.5, "on": 1.0, "biz": 0.0}, {"dia": 11, "ef": 0.0, "su": 80.0, "on": 0.0, "biz": 104.0}, {"dia": 12, "ef": 95.0, "su": 56.0, "on": 0.0, "biz": 0.0}, {"dia": 13, "ef": 177.0, "su": 8.0, "on": 0.0, "biz": 0.0}, {"dia": 14, "ef": 98.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 15, "ef": 50.0, "su": 67.0, "on": 0.0, "biz": 38.0}, {"dia": 16, "ef": 29.0, "su": 48.0, "on": 0.0, "biz": 12.0}, {"dia": 17, "ef": 25.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 18, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 19, "ef": 163.0, "su": 10.5, "on": 0.0, "biz": 25.0}, {"dia": 20, "ef": 44.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 21, "ef": 134.0, "su": 108.0, "on": 0.0, "biz": 0.0}, {"dia": 22, "ef": 26.0, "su": 59.0, "on": 0.0, "biz": 77.0}, {"dia": 23, "ef": 116.5, "su": 4.0, "on": 0.0, "biz": 75.0}, {"dia": 24, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 25, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 26, "ef": 123.5, "su": 95.5, "on": 0.0, "biz": 25.0}, {"dia": 27, "ef": 0.0, "su": 73.0, "on": 0.0, "biz": 125.0}, {"dia": 28, "ef": 16.0, "su": 49.0, "on": 0.0, "biz": 0.0}, {"dia": 29, "ef": 43.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 30, "ef": 137.0, "su": 25.0, "on": 0.0, "biz": 226.0}, {"dia": 31, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}], "gasFijos": [{"n": "Local", "v": 1000.0, "fijo": true}, {"n": "Electricidad", "v": 113.34, "fijo": false}, {"n": "Autonomo diciembre", "v": 515.89, "fijo": false}, {"n": "Asesoria", "v": 149.51, "fijo": false}, {"n": "Autonomo", "v": 231.63, "fijo": false}, {"n": "Pago fraccionado", "v": 249.25, "fijo": false}, {"n": "Google", "v": 154.5, "fijo": false}, {"n": "Facebook/insta", "v": 35.92, "fijo": false}, {"n": "Puerto", "v": 53.0, "fijo": true}, {"n": "Tienda", "v": 51.96, "fijo": false}, {"n": "Digi", "v": 29.0, "fijo": true}], "gasVar": [{"cat": "Amazon/Temu/Aliexpress", "prov": "AMAZON BUSSINES", "ref": "", "imp": 59.29}, {"cat": "Proveedores flores/plantas", "prov": "EL CALE", "ref": "", "imp": 221.0}, {"cat": "Amazon/Temu/Aliexpress", "prov": "AMAZON CAMARAS Y TARJETAS SD", "ref": "", "imp": 201.6}, {"cat": "Amazon/Temu/Aliexpress", "prov": "AMAZON PC", "ref": "", "imp": 389.0}, {"cat": "Amazon/Temu/Aliexpress", "prov": "AMAZON VITAMINAS", "ref": "", "imp": 9.89}, {"cat": "Amazon/Temu/Aliexpress", "prov": "ALIEXPRESS", "ref": "", "imp": 28.03}, {"cat": "Amazon/Temu/Aliexpress", "prov": "MANICURA 24 TI-1136", "ref": "", "imp": 105.56}, {"cat": "Amazon/Temu/Aliexpress", "prov": "TEMU", "ref": "", "imp": 100.55}, {"cat": "Proveedores flores/plantas", "prov": "EL CALE", "ref": "50388.0", "imp": 121.54}, {"cat": "Otros proveedores", "prov": "LUNEMA", "ref": "F/77", "imp": 557.44}, {"cat": "Proveedores flores/plantas", "prov": "CAPELLANIA", "ref": "", "imp": 122.43}, {"cat": "Proveedores flores/plantas", "prov": "LA PACHECA", "ref": "", "imp": 335.75}, {"cat": "Proveedores flores/plantas", "prov": "EL CALE", "ref": "", "imp": 511.36}, {"cat": "Amazon/Temu/Aliexpress", "prov": "AMAZON FUNDIDORA", "ref": "", "imp": 24.95}, {"cat": "Proveedores flores/plantas", "prov": "EL CALE", "ref": "254881.0", "imp": 205.39}]}, "2026-02": {"ventas": [{"dia": 1, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 116.0}, {"dia": 2, "ef": 46.5, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 3, "ef": 66.0, "su": 65.5, "on": 0.0, "biz": 110.0}, {"dia": 4, "ef": 3.0, "su": 21.0, "on": 0.0, "biz": 0.0}, {"dia": 5, "ef": 97.0, "su": 0.0, "on": 0.0, "biz": 100.0}, {"dia": 6, "ef": 86.0, "su": 84.5, "on": 0.0, "biz": 25.0}, {"dia": 7, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 8, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 9, "ef": 63.0, "su": 100.0, "on": 0.0, "biz": 139.0}, {"dia": 10, "ef": 44.0, "su": 241.0, "on": 0.0, "biz": 77.5}, {"dia": 11, "ef": 0.0, "su": 82.0, "on": 0.0, "biz": 190.5}, {"dia": 12, "ef": 69.0, "su": 50.0, "on": 0.0, "biz": 219.0}, {"dia": 13, "ef": 420.5, "su": 464.5, "on": 0.0, "biz": 273.0}, {"dia": 14, "ef": 920.0, "su": 1522.5, "on": 0.0, "biz": 0.0}, {"dia": 15, "ef": 10.0, "su": 287.0, "on": 0.0, "biz": 0.0}, {"dia": 16, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 17, "ef": 6.0, "su": 30.0, "on": 0.0, "biz": 94.0}, {"dia": 18, "ef": 34.0, "su": 70.0, "on": 0.0, "biz": 0.0}, {"dia": 19, "ef": 25.0, "su": 110.4, "on": 0.0, "biz": 35.0}, {"dia": 20, "ef": 125.0, "su": 66.0, "on": 0.0, "biz": 51.0}, {"dia": 21, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 22, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 23, "ef": 115.0, "su": 83.0, "on": 0.0, "biz": 0.0}, {"dia": 24, "ef": 56.0, "su": 96.0, "on": 0.0, "biz": 0.0}, {"dia": 25, "ef": 0.0, "su": 100.0, "on": 0.0, "biz": 0.0}, {"dia": 26, "ef": 10.0, "su": 48.0, "on": 0.0, "biz": 83.0}, {"dia": 27, "ef": 10.0, "su": 104.0, "on": 0.0, "biz": 0.0}, {"dia": 28, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 29, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 30, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 31, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}], "gasFijos": [{"n": "Local", "v": 1000.0, "fijo": true}, {"n": "Electricidad", "v": 124.47, "fijo": false}, {"n": "Agua", "v": 42.3, "fijo": false}, {"n": "Asesoria", "v": 40.0, "fijo": false}, {"n": "Autonomo", "v": 231.63, "fijo": false}, {"n": "Pago fraccionado", "v": 249.25, "fijo": false}, {"n": "Google", "v": 41.66, "fijo": false}, {"n": "Facebook/insta", "v": 35.62, "fijo": false}, {"n": "Puerto", "v": 53.0, "fijo": true}, {"n": "Tienda", "v": 247.34, "fijo": false}, {"n": "Digi", "v": 29.0, "fijo": true}], "gasVar": [{"cat": "Otros proveedores", "prov": "ACTION", "ref": "", "imp": 34.6}, {"cat": "Proveedores flores/plantas", "prov": "El Cale", "ref": "52612.0", "imp": 146.55}, {"cat": "Proveedores flores/plantas", "prov": "El Cale", "ref": "53019.0", "imp": 55.55}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "Abono 53085", "imp": -17.87}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "53609.0", "imp": 3227.78}, {"cat": "Proveedores flores/plantas", "prov": "VERDNATURA", "ref": "12276587.0", "imp": 103.72}, {"cat": "Proveedores flores/plantas", "prov": "VERDNATURA", "ref": "12331677.0", "imp": 290.53}, {"cat": "Proveedores flores/plantas", "prov": "VERDNATURA", "ref": "12322045.0", "imp": 40.5}, {"cat": "Amazon/Temu/Aliexpress", "prov": "temu", "ref": "", "imp": 30.55}, {"cat": "Proveedores flores/plantas", "prov": "IVA VERDNATURA", "ref": "", "imp": 49.57}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "54628.0", "imp": 178.69}, {"cat": "Amazon/Temu/Aliexpress", "prov": "Amazon", "ref": "Fundidora", "imp": 37.04}, {"cat": "Otros proveedores", "prov": "Gran Velada", "ref": "CE684277", "imp": 193.9}, {"cat": "Amazon/Temu/Aliexpress", "prov": "Temu", "ref": "", "imp": 73.37}]}, "2026-03": {"ventas": [{"dia": 1, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 2, "ef": 22.0, "su": 3.0, "on": 0.0, "biz": 16.0}, {"dia": 3, "ef": 50.0, "su": 56.0, "on": 0.0, "biz": 45.0}, {"dia": 4, "ef": 42.0, "su": 71.0, "on": 0.0, "biz": 50.0}, {"dia": 5, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 30.0}, {"dia": 6, "ef": 71.0, "su": 208.0, "on": 526.9, "biz": 19.0}, {"dia": 7, "ef": 216.5, "su": 307.5, "on": 0.0, "biz": 30.0}, {"dia": 8, "ef": 1420.5, "su": 1399.0, "on": 0.0, "biz": 30.0}, {"dia": 9, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 130.0}, {"dia": 10, "ef": 0.0, "su": 20.0, "on": 0.0, "biz": 80.0}, {"dia": 11, "ef": 100.0, "su": 76.0, "on": 0.0, "biz": 50.0}, {"dia": 12, "ef": 38.0, "su": 15.0, "on": 65.0, "biz": 82.0}, {"dia": 13, "ef": 103.0, "su": 225.0, "on": 0.0, "biz": 76.0}, {"dia": 14, "ef": 10.0, "su": 73.0, "on": 0.0, "biz": 50.0}, {"dia": 15, "ef": 0.0, "su": 15.0, "on": 120.0, "biz": 72.0}, {"dia": 16, "ef": 70.0, "su": 202.5, "on": 43.0, "biz": 14.5}, {"dia": 17, "ef": 20.0, "su": 224.5, "on": 87.78, "biz": 0.0}, {"dia": 18, "ef": 151.5, "su": 58.0, "on": 0.0, "biz": 0.0}, {"dia": 19, "ef": 66.0, "su": 4.0, "on": 0.0, "biz": 0.0}, {"dia": 20, "ef": 73.0, "su": 71.0, "on": 0.0, "biz": 0.0}, {"dia": 21, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 22, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 23, "ef": 61.0, "su": 38.5, "on": 0.0, "biz": 0.0}, {"dia": 24, "ef": 137.0, "su": 290.0, "on": 0.0, "biz": 0.0}, {"dia": 25, "ef": 128.0, "su": 115.0, "on": 0.0, "biz": 0.0}, {"dia": 26, "ef": 81.0, "su": 64.0, "on": 0.0, "biz": 0.0}, {"dia": 27, "ef": 47.0, "su": 80.0, "on": 0.0, "biz": 0.0}, {"dia": 28, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 29, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 30, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}, {"dia": 31, "ef": 0.0, "su": 0.0, "on": 0.0, "biz": 0.0}], "gasFijos": [{"n": "Local", "v": 1000.0, "fijo": true}, {"n": "Electricidad", "v": 110.69, "fijo": false}, {"n": "Asesoria", "v": 40.0, "fijo": false}, {"n": "Autonomo", "v": 231.63, "fijo": false}, {"n": "Google", "v": 283.1, "fijo": false}, {"n": "Facebook/insta", "v": 8.33, "fijo": false}, {"n": "Digi", "v": 29.0, "fijo": true}], "gasVar": [{"cat": "Otros proveedores", "prov": "Leroy Merlín", "ref": "278-0003-228196", "imp": 37.29}, {"cat": "Amazon/Temu/Aliexpress", "prov": "Liu Yingqian", "ref": "", "imp": 65.0}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "56378.0", "imp": 367.12}, {"cat": "Amazon/Temu/Aliexpress", "prov": "Temu", "ref": "", "imp": 123.22}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "56793.0", "imp": 132.16}, {"cat": "Amazon/Temu/Aliexpress", "prov": "Amazon Cricut", "ref": "", "imp": 156.87}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "57756.0", "imp": 186.78}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "58384.0", "imp": 221.93}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "59308.0", "imp": 270.38}, {"cat": "Proveedores flores/plantas", "prov": "El cale", "ref": "60200.0", "imp": 184.82}, {"cat": "Proveedores flores/plantas", "prov": "La Pacheca", "ref": "41-01618", "imp": 206.75}, {"cat": "Proveedores flores/plantas", "prov": "La Pacheca", "ref": "41-02473", "imp": 34.79}, {"cat": "Proveedores flores/plantas", "prov": "VerdNatura", "ref": "A12612629", "imp": 905.28}, {"cat": "Proveedores flores/plantas", "prov": "ACTION", "ref": "", "imp": 31.92}, {"cat": "Proveedores flores/plantas", "prov": "Ezedichi SL", "ref": "W/2026/01373", "imp": 348.76}, {"cat": "Proveedores flores/plantas", "prov": "Colomaflor", "ref": "A26 000431", "imp": 95.72}, {"cat": "Proveedores flores/plantas", "prov": "Manuel Rios Parraga", "ref": "A26 000434", "imp": 610.87}, {"cat": "Proveedores flores/plantas", "prov": "Asociacion de Floristas", "ref": "", "imp": 64.0}]}};
+// Si no hay datos guardados, pre-cargamos el histórico de Enero-Marzo 2026
+if(!localStorage.getItem('pd_finanzas')) {
+  localStorage.setItem('pd_finanzas', JSON.stringify(finanzasData));
+}
 // finanzasData = { "2026-01": { ventas:[{dia,ef,su,on,biz}], gastosFijos:{local:1000,...}, gastosVar:[{cat,prov,ref,imp}] } }
 let finanzasMes = new Date().toISOString().slice(0,7); // "2026-04"
 
@@ -3731,6 +3735,7 @@ function renderFinanzas(){
   renderFinanzasGasFijos();
   renderFinanzasGasVar();
   renderFinanzasSummary();
+  setTimeout(renderFinGrafico, 100);
 }
 
 function renderFinanzasVentas(){
@@ -4025,6 +4030,140 @@ async function importarVentasSumUp(){
   } finally {
     if(btn){ btn.textContent='📥 Importar desde SumUp'; btn.disabled=false; }
   }
+}
+
+
+// ══ GRÁFICA MENSUAL FINANZAS ═════════════════════════════════
+function renderFinGrafico(){
+  const MESES_LABELS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const objetivo = parseFloat(el('finObjetivo')?.value)||6000;
+
+  const labels = [], ingresos = [], gastos = [];
+
+  for(let m=1; m<=12; m++){
+    const key = '2026-'+String(m).padStart(2,'0');
+    const d = finanzasData[key];
+    if(!d){ labels.push(MESES_LABELS[m-1]); ingresos.push(null); gastos.push(null); continue; }
+    const tv  = d.ventas.reduce((s,v)=>s+(v.ef||0)+(v.su||0)+(v.on||0)+(v.biz||0),0);
+    const tf  = d.gasFijos.reduce((s,g)=>s+(parseFloat(g.v)||0),0);
+    const tv2 = d.gasVar.reduce((s,g)=>s+(parseFloat(g.imp)||0),0);
+    labels.push(MESES_LABELS[m-1]);
+    ingresos.push(Math.round(tv*100)/100);
+    gastos.push(Math.round((tf+tv2)*100)/100);
+  }
+
+  const datasets = [
+    {label:'Ingresos',    data:ingresos, color:'var(--gn)', fill:true},
+    {label:'Gastos',      data:gastos,   color:'var(--rd)', fill:false},
+    {label:'Objetivo',    data:Array(12).fill(objetivo), color:'var(--bl)', dash:true, fill:false},
+  ];
+
+  drawFinChart('finGrafCanvas', labels, datasets, objetivo);
+}
+
+function drawFinChart(canvasId, labels, datasets, objetivo){
+  const canvas = el(canvasId);
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio||1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width - 36;
+  const H = 220;
+  canvas.width  = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr,dpr);
+
+  const padL=60,padR=20,padT=20,padB=40;
+  const cW=W-padL-padR, cH=H-padT-padB;
+
+  const allVals = datasets.flatMap(d=>d.data.filter(v=>v!==null));
+  if(!allVals.length) return;
+  const maxV = Math.max(...allVals)*1.1||10000;
+  const minV = 0;
+  const range = maxV-minV||1;
+
+  const style2 = getComputedStyle(document.documentElement);
+  const getVar = v => style2.getPropertyValue(v.replace('var(','').replace(')','').trim()).trim();
+  const colBd  = getVar('--bd') || '#e8ddd5';
+  const colTxd = getVar('--txd')|| '#9a8880';
+  const colSf  = getVar('--sf') || '#ffffff';
+
+  ctx.fillStyle = colSf;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid
+  for(let i=0;i<=5;i++){
+    const y=padT+cH-(i/5)*cH;
+    ctx.strokeStyle=colBd; ctx.lineWidth=0.8;
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(padL+cW,y); ctx.stroke();
+    const val = (minV+(i/5)*range);
+    ctx.fillStyle=colTxd; ctx.font='10px Consolas,monospace'; ctx.textAlign='right';
+    ctx.fillText(val>=1000?(val/1000).toFixed(1)+'k':val.toFixed(0), padL-6, y+3);
+  }
+
+  // X labels
+  const step = labels.length>1 ? cW/(labels.length-1) : cW;
+  labels.forEach((lbl,i)=>{
+    const x=padL+i*step;
+    ctx.fillStyle=colTxd; ctx.font='10px Consolas,monospace'; ctx.textAlign='center';
+    ctx.fillText(lbl, x, H-padB+16);
+  });
+
+  // Datasets
+  datasets.forEach(ds => {
+    const pts = ds.data.map((v,i)=>v===null?null:{x:padL+i*step, y:padT+cH-((v-minV)/range)*cH});
+    const color = getVar(ds.color.includes('var')?ds.color:'--ac') || ds.color;
+
+    // Fill area under ingresos
+    if(ds.fill){
+      ctx.fillStyle = color+'22';
+      ctx.beginPath();
+      let started=false;
+      pts.forEach((p,i)=>{
+        if(!p)return;
+        if(!started){ctx.moveTo(p.x,padT+cH);ctx.lineTo(p.x,p.y);started=true;}
+        else ctx.lineTo(p.x,p.y);
+      });
+      const lastPt = pts.filter(p=>p).pop();
+      if(lastPt){ctx.lineTo(lastPt.x,padT+cH);ctx.closePath();ctx.fill();}
+    }
+
+    // Line
+    ctx.strokeStyle=color; ctx.lineWidth=ds.dash?1.5:2.5;
+    ctx.lineJoin='round';
+    if(ds.dash) ctx.setLineDash([6,4]);
+    else ctx.setLineDash([]);
+    ctx.beginPath();
+    let started=false;
+    pts.forEach(p=>{
+      if(!p){started=false;return;}
+      if(!started){ctx.moveTo(p.x,p.y);started=true;}
+      else ctx.lineTo(p.x,p.y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dots + values
+    if(!ds.dash){
+      pts.forEach((p,i)=>{
+        if(!p||ds.data[i]===null) return;
+        ctx.fillStyle=color;
+        ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=colSf;
+        ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();
+        // Value label
+        const val = ds.data[i];
+        ctx.fillStyle=color; ctx.font='bold 10px Consolas,monospace'; ctx.textAlign='center';
+        ctx.fillText(val>=1000?(val/1000).toFixed(1)+'k':val.toFixed(0), p.x, p.y-8);
+      });
+    }
+  });
+
+  // Axes
+  ctx.strokeStyle=colBd; ctx.lineWidth=1.5; ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(padL,padT); ctx.lineTo(padL,padT+cH); ctx.lineTo(padL+cW,padT+cH);
+  ctx.stroke();
 }
 
 // ── WIRE UP STATIC HTML EVENT LISTENERS ─────────────────
