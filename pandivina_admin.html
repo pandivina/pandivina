@@ -928,6 +928,69 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
 </div>
 
+
+<!-- ══ PEDIDOS ════════════════════════════════════════════ -->
+<div class="panel" id="panel-pedidos">
+  <div class="stat-grid" id="pedidosSummary" style="margin-bottom:18px"></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <input type="text" class="fib" id="pedidosSearch" placeholder="Buscar cliente o descripción…" oninput="renderPedidos()" style="width:220px">
+    <div style="position:relative;min-width:160px">
+      <select class="fib" id="pedidosFilter" onchange="renderPedidos()" style="appearance:none;padding-right:28px">
+        <option value="todos">Todos los estados</option>
+        <option value="pendiente">Pendiente</option>
+        <option value="en_proceso">En proceso</option>
+        <option value="listo">Listo para entregar</option>
+        <option value="entregado">Entregado</option>
+        <option value="cancelado">Cancelado</option>
+      </select>
+      <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--txd);pointer-events:none">▾</span>
+    </div>
+    <button class="btn btn-p" onclick="abrirNuevoPedido()" style="margin-left:auto">+ Nuevo pedido</button>
+  </div>
+  <div id="pedidosList"></div>
+</div>
+
+<!-- ══ CLIENTES ══════════════════════════════════════════════ -->
+<div class="panel" id="panel-clientes">
+  <div class="stat-grid" id="clientesSummary" style="margin-bottom:18px"></div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+    <input type="text" class="fib" id="clientesSearch" placeholder="Buscar cliente…" oninput="renderClientes()" style="width:220px">
+    <button class="btn btn-p" onclick="abrirClienteModal(null)" style="margin-left:auto">+ Nuevo cliente</button>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hdr">🔔 Próximas fechas especiales — 30 días</div>
+    <div id="proximasFechas" style="padding:0 4px"></div>
+  </div>
+  <div id="clientesList"></div>
+</div>
+
+<!-- ══ LISTA DE LA COMPRA ════════════════════════════════ -->
+<div class="panel" id="panel-compra">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-style:italic">Lista de la compra</div>
+      <div style="font-size:12px;color:var(--txd);margin-top:2px">Generada automáticamente según stock mínimo del inventario</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="addCompraManual()" style="font-size:12px">+ Añadir artículo</button>
+      <button class="btn btn-o" onclick="printCompra()" style="font-size:12px">🖨️ Imprimir</button>
+      <button class="btn btn-o" onclick="clearCompraCompletados()" style="font-size:12px;color:var(--rd)">🗑 Limpiar completados</button>
+    </div>
+  </div>
+  <div class="stat-grid" id="compraSummary" style="margin-bottom:18px"></div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hdr"><span>⚠️ Stock bajo — necesitas reponer</span><span id="compraBajoCount" style="color:var(--txd)"></span></div>
+    <div id="compraBajoList" style="padding:0 4px"></div>
+  </div>
+  <div class="card">
+    <div class="card-hdr"><span>📝 Artículos adicionales</span><span id="compraManualCount" style="color:var(--txd)"></span></div>
+    <div id="compraManualList" style="padding:0 4px"></div>
+    <div style="padding:0 14px 12px">
+      <button class="add-row" onclick="addCompraManual()"><span style="font-size:16px">+</span> Añadir artículo manualmente</button>
+    </div>
+  </div>
+</div>
+
 </main>
 </div><!-- /appScreen -->
 
