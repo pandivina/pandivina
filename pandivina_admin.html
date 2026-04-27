@@ -357,6 +357,92 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 
 <!-- ══ LOGIN ════════════════════════════════════════════ -->
 
+<!-- ══ ESCANDALLO DRAWER ════════════════════════════════════ -->
+<div class="esc-drawer-backdrop" id="escBackdrop" onclick="closeEscDrawer()"></div>
+<div class="esc-drawer" id="escDrawer">
+  <div class="esc-drawer-header">
+    <span class="esc-drawer-title" id="drawerTitle">Nueva receta</span>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select class="fib" id="dishSel" style="appearance:none;padding-right:26px;font-size:13px;min-width:160px"></select>
+      <button class="btn btn-p" onclick="newDish()" style="font-size:12px;white-space:nowrap">+ Nueva</button>
+      <button class="btn btn-o" onclick="delDish()" style="font-size:12px;color:var(--rd);border-color:rgba(212,80,106,.3)">🗑</button>
+      <button class="btn-x" data-action="close-drawer" style="font-size:22px;padding:0 6px">×</button>
+    </div>
+  </div>
+  <div class="esc-drawer-body">
+    <div class="fb" style="margin-bottom:16px">
+      <span style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txd)">Gastos fijos</span>
+      <div><span class="fv" id="bMes">—</span><span class="fl">/ mes</span></div>
+      <div><span class="fv" id="bDia">—</span><span class="fl">/ día</span></div>
+      <div><span class="fv" id="bSem">—</span><span class="fl">/ semana</span></div>
+    </div>
+    <div style="margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bd)">
+      <input type="text" class="fi" id="dishName" placeholder="Nombre del plato…" oninput="recalc()"
+        style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;width:100%;border-bottom:2px solid transparent;border-radius:0;padding:4px 0">
+      <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+        <div><div class="slbl">Raciones</div><input type="number" class="fib" id="servings" value="1" min="1" step="1" oninput="recalc()" style="width:80px"></div>
+        <div><div class="slbl">PVP (€)</div><input type="number" class="fib" id="salePrice" placeholder="0.00" step="0.01" oninput="recalc()" style="width:100px"></div>
+        <div><div class="slbl">Raciones/día</div><input type="number" class="fib" id="dailySales" placeholder="Ej:20" step="1" min="0" oninput="recalc()" style="width:100px"></div>
+        <div><div class="slbl">Categoría</div><input type="text" class="fib" id="category" placeholder="Ej: Jabones" style="width:130px" oninput="recalc()"></div>
+      </div>
+    </div>
+    <div class="slbl">Ingredientes</div>
+    <div class="th-row ing-row">
+      <span class="cl">Ingrediente</span><span class="cl" style="text-align:right">Cant.</span>
+      <span class="cl">Ud</span><span class="cl" style="text-align:right">€/ud</span>
+      <span class="cl" style="text-align:right">Total</span><span></span>
+    </div>
+    <div id="ingList"></div>
+    <button class="add-row" onclick="addIng()"><span style="font-size:16px">+</span> Añadir ingrediente</button>
+    <div class="sep"></div>
+    <div class="slbl">Análisis — Materia Prima</div>
+    <div class="res-grid">
+      <div class="res-cell"><span class="sl">Coste MP total</span><span class="rv" id="rTMP">—</span><span style="font-size:10px;color:var(--txd)" id="rTMPs"></span></div>
+      <div class="res-cell"><span class="sl">MP/ración</span><span class="rv" id="rMP" style="color:var(--ack)">—</span></div>
+      <div class="res-cell"><span class="sl">Food cost %</span><span class="rv" id="rFC">—</span><span style="font-size:10px;color:var(--txd)" id="rFCs">Introduce PVP</span></div>
+      <div class="res-cell"><span class="sl">Margen bruto</span><span class="rv" id="rMB">—</span></div>
+      <div class="res-cell"><span class="sl">PVP sugerido 30%</span><span class="rv" id="rPVP">—</span></div>
+    </div>
+    <div id="fcBar" style="display:none;margin-top:14px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px">
+      <div class="bar-wrap">
+        <div class="bar-row"><span class="cl">Food cost s/ PVP</span><span style="font-size:12px;color:var(--tx)" id="fcL">0%</span></div>
+        <div class="bar-track"><div class="bar-fill" id="fcF" style="width:0%"></div></div>
+        <div class="bar-z"><span class="bz">Óptimo &lt;30%</span><span class="bz">Aceptable 30–40%</span><span class="bz">Alto &gt;40%</span></div>
+      </div>
+    </div>
+    <div id="bdBox" style="display:none;margin-top:14px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+      <div class="card-hdr"><span>Coste real/ración (MP + fijos)</span><span id="bdNote" style="color:var(--txd)"></span></div>
+      <div class="bd-grid">
+        <div class="bd-box mp"><span class="bdl">MP/ración</span><span class="bdv" id="bdMP" style="color:var(--ack)">—</span></div>
+        <div class="bd-box fx"><span class="bdl">Fijos/ración</span><span class="bdv" id="bdFX" style="color:var(--bl)">—</span><span style="font-size:10px;color:var(--txd)" id="bdFXs"></span></div>
+        <div class="bd-box tc"><span class="bdl">Coste total</span><span class="bdv" id="bdTC" style="color:var(--rd)">—</span></div>
+        <div class="bd-box nt"><span class="bdl">Margen neto</span><span class="bdv" id="bdNT">—</span></div>
+      </div>
+      <div style="padding:0 18px 14px">
+        <div class="bar-wrap">
+          <div class="bar-row"><span class="cl">Coste total s/ PVP</span><span style="font-size:12px;color:var(--tx)" id="tcL">0%</span></div>
+          <div class="bar-track" style="height:10px"><div class="bar-fill" id="tcF" style="width:0%"></div></div>
+          <div class="bar-z"><span class="bz">Rentable &lt;70%</span><span class="bz">Ajustado 70–85%</span><span class="bz">Pérdidas &gt;100%</span></div>
+        </div>
+      </div>
+    </div>
+    <div id="beBox" style="display:none;margin-top:14px;border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+      <div class="card-hdr">Punto de equilibrio</div>
+      <div class="be-grid">
+        <div class="be-cell"><span class="bev" id="beD">—</span><span style="font-size:10px;text-transform:uppercase;color:var(--txd)">rac/día</span><span style="font-size:10px;color:var(--txd)" id="beDs"></span></div>
+        <div class="be-cell"><span class="bev" id="beW">—</span><span style="font-size:10px;text-transform:uppercase;color:var(--txd)">rac/semana</span></div>
+        <div class="be-cell"><span class="bev" id="beM">—</span><span style="font-size:10px;text-transform:uppercase;color:var(--txd)">rac/mes</span></div>
+        <div class="be-cell"><span class="bev" id="beRev">—</span><span style="font-size:10px;text-transform:uppercase;color:var(--txd)">facturación mín./mes</span></div>
+      </div>
+    </div>
+    <div style="margin-top:18px"><div class="slbl">Notas</div><textarea class="notes-ta" id="dishNotes" placeholder="Instrucciones, alérgenos…"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
+      <button class="btn btn-p" style="flex:1" data-action="save-close">💾 Guardar y cerrar</button>
+      <button class="btn btn-o" data-action="cancel-drawer">Cerrar sin guardar</button>
+    </div>
+  </div>
+</div>
+
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-brand">Pandivina</div>
@@ -400,10 +486,21 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
 </header>
 
+<!-- Alerta beneficio -->
+<div id="alertaBeneficio" style="display:none;background:var(--rdd);border-bottom:2px solid var(--rd);padding:9px 24px;display:none;align-items:center;gap:12px;flex-wrap:wrap">
+  <span style="font-size:16px">🚨</span>
+  <span style="font-size:13px;color:var(--rd);flex:1" id="alertaBeneficioMsg"></span>
+  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:16px;padding:0 4px">×</button>
+</div>
+
 <div class="tabs">
-  <button class="tab on" data-tab="recetas">📋 Recetas</button>
+  <button class="tab on" data-tab="inicio">🏠 Inicio</button>
+  <button class="tab" data-tab="recetas">📋 Recetas</button>
+  <button class="tab" data-tab="pedidos">📦 Pedidos</button>
+  <button class="tab" data-tab="clientes">👥 Clientes</button>
   <button class="tab" data-tab="flores">🌸 Flores</button>
   <button class="tab" data-tab="inv">Inventario</button>
+  <button class="tab" data-tab="compra">🛒 Compra</button>
   <button class="tab" data-tab="productos">🛒 Tienda</button>
   <button class="tab" data-tab="ventas">📊 Ventas</button>
   <button class="tab" data-tab="res">Resumen</button>
@@ -416,8 +513,95 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <!-- ══ ESCANDALLO ══════════════════════════════════════ -->
 
 
+<!-- ══ INICIO / DASHBOARD ════════════════════════════════ -->
+<div class="panel on" id="panel-inicio">
+
+  <!-- Saludo + fecha -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:32px;font-weight:300" id="dashGreeting">Buenos días</div>
+      <div style="font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--txd)" id="dashDate"></div>
+    </div>
+    <button class="btn btn-o" id="btnDashRefresh" style="font-size:12px">🔄 Actualizar</button>
+  </div>
+
+  <!-- KPIs del día -->
+  <div class="stat-grid" id="dashKpis" style="margin-bottom:18px">
+    <div class="stat-cell">
+      <span class="sl">Ventas hoy</span>
+      <span class="sv" id="dashVentasHoy" style="color:var(--ack)">—</span>
+      <span style="font-size:10px;color:var(--txd)" id="dashVentasHoyCount"></span>
+    </div>
+    <div class="stat-cell">
+      <span class="sl">Efectivo hoy</span>
+      <span class="sv" id="dashEfectivo" style="color:var(--or)">—</span>
+    </div>
+    <div class="stat-cell">
+      <span class="sl">Tarjeta hoy</span>
+      <span class="sv" id="dashTarjeta" style="color:var(--bl)">—</span>
+    </div>
+    <div class="stat-cell">
+      <span class="sl">Ticket medio</span>
+      <span class="sv" id="dashTicket" style="color:var(--gn)">—</span>
+    </div>
+    <div class="stat-cell">
+      <span class="sl">Gastos fijos/día</span>
+      <span class="sv" id="dashGastosDia" style="color:var(--rd)">—</span>
+    </div>
+    <div class="stat-cell">
+      <span class="sl">Beneficio estimado</span>
+      <span class="sv" id="dashBeneficio">—</span>
+      <span style="font-size:10px;color:var(--txd)">ventas − fijos/día</span>
+    </div>
+  </div>
+
+  <!-- Fila 2: alertas + flores + inventario -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- Alertas del día -->
+    <div class="card">
+      <div class="card-hdr">⚠️ Alertas</div>
+      <div id="dashAlertas" style="padding:14px">
+        <div style="color:var(--txd);font-size:13px;text-align:center;padding:16px 0">Cargando…</div>
+      </div>
+    </div>
+
+    <!-- Estado flores -->
+    <div class="card">
+      <div class="card-hdr">🌸 Stock de flores hoy</div>
+      <div id="dashFlores" style="padding:14px">
+        <div style="color:var(--txd);font-size:13px;text-align:center;padding:16px 0">Cargando…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Fila 3: recetas top + punto equilibrio -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- Top recetas por margen -->
+    <div class="card">
+      <div class="card-hdr">📋 Recetas más rentables</div>
+      <div id="dashTopRecetas" style="padding:14px"></div>
+    </div>
+
+    <!-- Punto de equilibrio del día -->
+    <div class="card">
+      <div class="card-hdr">📊 Punto de equilibrio hoy</div>
+      <div id="dashEquilibrio" style="padding:14px"></div>
+    </div>
+
+  </div>
+
+  <!-- Nota si SumUp no conectado -->
+  <div id="dashSumUpNote" style="display:none;background:var(--acd);border:1px solid var(--ac);border-radius:8px;padding:11px 16px;font-size:12px;color:var(--ack);margin-bottom:14px">
+    💡 Conecta SumUp en <strong>⚙ Ajustes</strong> para ver las ventas reales del día en el dashboard.
+  </div>
+
+</div>
+
 <!-- ══ RECETAS ══════════════════════════════════════════ -->
-<div class="panel on" id="panel-recetas">
+<div class="panel" id="panel-recetas">
   <div class="stat-grid" id="recSummary"></div>
   <div class="chips" style="gap:8px">
     <input type="text" class="fib" id="recSearch" placeholder="Buscar receta…" oninput="renderRecetas()" style="width:200px">
@@ -475,6 +659,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     <button class="chip" data-ft="verde" onclick="setFlF('verde',this)">🌿 Verde</button>
     <button class="chip" data-ft="preservada" onclick="setFlF('preservada',this)">✨ Preservada</button>
     <button class="chip" data-ft="otra" onclick="setFlF('otra',this)">Otra</button>
+    <button class="chip" onclick="verGraficoFlores()" style="background:var(--bld);color:var(--bl);border-color:var(--bl)">📊 Gráfico precios</button>
     <button class="chip" style="margin-left:auto" onclick="verUsos()">🔗 Usos en escandallos</button>
   </div>
   <div class="card">
@@ -504,6 +689,30 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
   <!-- Historial / Usos -->
   <div class="card" id="flHistCard" style="display:none"><div class="card-hdr"><span id="flHistTitle">Historial</span><button class="btn-x" onclick="el('flHistCard').style.display='none'">×</button></div><div style="overflow-x:auto"><table class="ov-table"><thead><tr><th>Semana</th><th class="r">€ manojo</th><th class="r">€/tallo</th><th class="r">Tallos/mj</th><th>Notas</th></tr></thead><tbody id="flHistBody"></tbody></table></div></div>
+  <!-- Gráfico evolución precios -->
+  <div class="card" id="flGraficoCard" style="display:none;margin-bottom:14px">
+    <div class="card-hdr">
+      <span>📊 Evolución de precios — <span id="flGraficoTitle">—</span></span>
+      <button class="btn-x" onclick="el('flGraficoCard').style.display='none'">×</button>
+    </div>
+    <div style="padding:18px">
+      <canvas id="flGraficoCanvas" height="200"></canvas>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap" id="flGraficoLegend"></div>
+    </div>
+  </div>
+
+  <!-- Proveedores -->
+  <div class="card" style="margin-top:14px">
+    <div class="card-hdr">
+      <span>🤝 Proveedores</span>
+      <button class="btn btn-o" onclick="abrirProvModal(null)" style="font-size:11px">+ Añadir proveedor</button>
+    </div>
+    <div id="provList" style="padding:0 4px"></div>
+    <div style="padding:0 14px 12px">
+      <button class="add-row" onclick="abrirProvModal(null)"><span style="font-size:16px">+</span> Añadir proveedor</button>
+    </div>
+  </div>
+
   <div class="card" id="flUsosCard" style="display:none"><div class="card-hdr"><span>Flores en escandallos</span><button class="btn-x" onclick="el('flUsosCard').style.display='none'">×</button></div><div style="overflow-x:auto"><table class="ov-table"><thead><tr><th>Escandallo</th><th>Ingrediente</th><th class="r">€ escandallo</th><th class="r">€ subasta</th><th>Diferencia</th></tr></thead><tbody id="flUsosBody"></tbody></table></div></div>
 </div>
 
@@ -521,6 +730,12 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     <button class="chip" data-ic="otro" onclick="setInvF('otro',this)">Otro</button>
     <button class="chip" style="margin-left:auto" onclick="invLow=!invLow;renderInv()">⚠ Stock bajo</button>
   </div>
+  <!-- Valor por categoría -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hdr">Valor del inventario por categoría</div>
+    <div id="invCatBreakdown" style="padding:16px 18px"></div>
+  </div>
+
   <div class="card">
     <div class="card-hdr"><span>Inventario</span><span id="invCount" style="color:var(--txd)"></span></div>
     <div style="overflow-x:auto;padding-bottom:4px">
@@ -588,6 +803,33 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     <div class="stat-cell"><span class="sv" id="vstCash" style="color:var(--or)">—</span><span class="sl">Pagos en efectivo</span></div>
   </div>
 
+  <!-- Comparativa periodo anterior -->
+  <div class="card" id="ventasComparativa" style="display:none;margin-bottom:16px">
+    <div class="card-hdr"><span>📈 Comparativa con periodo anterior</span><span id="compPeriodoLabel" style="color:var(--txd)"></span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--bd)">
+      <div style="background:var(--sf);padding:16px 18px">
+        <div class="sl">Total ventas</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:var(--ack)" id="compTotal">—</div>
+        <div id="compTotalDiff" style="font-size:12px;margin-top:4px"></div>
+      </div>
+      <div style="background:var(--sf);padding:16px 18px">
+        <div class="sl">Transacciones</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px" id="compCount">—</div>
+        <div id="compCountDiff" style="font-size:12px;margin-top:4px"></div>
+      </div>
+      <div style="background:var(--sf);padding:16px 18px">
+        <div class="sl">Ticket medio</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:var(--gn)" id="compTicket">—</div>
+        <div id="compTicketDiff" style="font-size:12px;margin-top:4px"></div>
+      </div>
+      <div style="background:var(--sf);padding:16px 18px">
+        <div class="sl">Periodo anterior</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:var(--txd)" id="compAnt">—</div>
+        <div style="font-size:11px;color:var(--txd);margin-top:4px" id="compAntLabel"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Top products -->
   <div class="card" id="ventasTopCard" style="display:none;margin-bottom:16px">
     <div class="card-hdr">Productos más vendidos</div>
@@ -621,7 +863,10 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <!-- ══ RESUMEN ══════════════════════════════════════════ -->
 <div class="panel" id="panel-res">
   <div class="card">
-    <div class="card-hdr">Todas las recetas</div>
+    <div class="card-hdr">
+      <span>Todas las recetas</span>
+      <button class="btn btn-o" onclick="verHistorialPrecios()" style="font-size:11px">📈 Historial de precios</button>
+    </div>
     <div style="overflow-x:auto">
       <table class="ov-table"><thead><tr><th>Receta</th><th class="r">PVP</th><th class="r">MP/rac</th><th class="r">Food cost</th><th class="r">Fijos/rac</th><th class="r">Coste total</th><th class="r">Margen neto</th><th>Estado</th></tr></thead><tbody id="ovBody"></tbody></table>
     </div>
@@ -677,7 +922,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
     <div class="card-hdr">WhatsApp de contacto</div>
     <div style="padding:18px;max-width:380px">
       <div class="slbl">Número (con prefijo país, sin +)</div>
-      <input type="text" class="fib" id="waNum" placeholder="34600000000" style="margin-bottom:10px">
+      <input type="text" class="fib" id="waNum" placeholder="34680275560" style="margin-bottom:10px">
       <button class="btn btn-p" onclick="saveWA()" style="font-size:12px">Guardar</button>
     </div>
   </div>
@@ -718,7 +963,14 @@ function doLogin(){
 if(window._pendingInit) init();
   }
 }
-function logout(){ if(!confirm('¿Cerrar sesión?'))return; location.reload(); }
+function logout(){
+  if(!confirm('¿Cerrar sesión?')) return;
+  sessionStorage.removeItem('pd_logged');
+  el('appScreen').style.display = 'none';
+  el('loginScreen').style.display = 'flex';
+  if(el('pwInput')){ el('pwInput').value=''; el('pwInput').focus(); }
+  if(typeof closeEscDrawer==='function') closeEscDrawer();
+}
 function changePw(){
   const cur=el('pwActual').value, nw=el('pwNueva').value, cf=el('pwConfirm').value;
   const stored=localStorage.getItem('pd_pw')||DEFAULT_PW;
@@ -763,6 +1015,16 @@ let products = JSON.parse(localStorage.getItem('pd_products')||'null') || [
 ];
 
 let activeDish=dishes[0].id, invF='todos', invLow=false, flF='todas', albResultados=[];
+let pedidos = JSON.parse(localStorage.getItem('pd_pedidos')||'null') || [];
+let compraExtra = JSON.parse(localStorage.getItem('pd_compra')||'null') || [];
+let preciosHist = JSON.parse(localStorage.getItem('pd_precios_hist')||'null') || {};
+let proveedores = JSON.parse(localStorage.getItem('pd_proveedores')||'null') || [];
+let clientes = JSON.parse(localStorage.getItem('pd_clientes')||'null') || [];
+let clienteEditId = null;
+let fechasExtra = [];
+// proveedores = [{id, nombre, tel, email, notas, flores:[florId,...]}]
+// preciosHist = { "NombreIngrediente": [{fecha, precio, receta}] }
+let pedidoEditId = null;
 let recCatF='todas';
 let currentTheme=localStorage.getItem('pd_theme')||'light';
 let customColors=JSON.parse(localStorage.getItem('pd_cc')||'{}');
@@ -808,8 +1070,12 @@ function goTab(id,btn){
   el('panel-'+id).classList.add('on'); btn.classList.add('on');
   if(id==='res')renderOverview();
   if(id==='gastos')renderFixed();
-  if(id==='inv'){renderInv();renderInvSum();}
-  if(id==='flores'){renderFlSems();renderFlores();renderFlSum();}
+  if(id==='inv'){renderInv();renderInvSum();renderInvCatBreakdown();}
+  if(id==='inicio')loadDashboard();
+  if(id==='pedidos')renderPedidos();
+  if(id==='compra')renderCompra();
+  if(id==='clientes')renderClientes();
+  if(id==='flores'){renderFlSems();renderFlores();renderFlSum();renderProveedores();}
   if(id==='productos')renderProducts();
   if(id==='recetas')renderRecetas();
   if(id==='ventas'){}; // panel ready
@@ -820,6 +1086,7 @@ function goTab(id,btn){
     const sum=localStorage.getItem('pd_su_merchant')||'';
     const wa=localStorage.getItem('pd_wa')||'';
     el('sbUrl').value=su; el('sbKey').value=sk;
+    el('waNum').value=localStorage.getItem('pd_wa')||'34680275560';
     updateSumUpStatus();
     el('waNum').value=wa;
   }
@@ -827,6 +1094,8 @@ function goTab(id,btn){
 
 // ══ THEME ════════════════════════════════════════════════
 function applyTheme(n){
+  // Redraw chart if visible
+  setTimeout(()=>{ if(el('flGraficoCard')?.style.display==='block') verGraficoFlores(); }, 300);
   currentTheme=n;
   document.documentElement.className=n==='dark'?'dark':'';
   if(n==='custom')applyCC();
@@ -986,7 +1255,10 @@ function renderRecetas(){
     const fps=ds>0?fd/ds:null,tc=fps!==null?mp+fps:null,nm=tc!==null&&sale>0?sale-tc:null;
     const fcc=fc===null?'var(--txd)':fc<=30?'var(--gn)':fc<=40?'var(--or)':'var(--rd)';
     const badge=!sale?'<span class="badge b-ac">Sin precio</span>':nm!==null&&nm<0?'<span class="badge b-rd">Pérdidas</span>':fc!==null&&fc<=30?'<span class="badge b-gn">Óptimo</span>':fc!==null&&fc<=40?'<span class="badge b-ac">Aceptable</span>':'<span class="badge b-or">Revisar</span>';
-    return `<div class="rec-card"><div style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:6px"><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;flex:1">${d.name||'Sin nombre'}</div>${badge}</div>${d.category?`<span style="font-size:10px;background:var(--acd);color:var(--ack);padding:2px 8px;border-radius:10px">${d.category}</span>`:''}<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px"><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">MP/ración</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:var(--ack)">${mp>0?fmt(mp):'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">PVP</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px">${sale>0?fmt(sale):'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">Food cost</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:${fcc}">${fc!==null?fc.toFixed(1)+'%':'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">Margen neto</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:${nm===null?'var(--txd)':nm>=0?'var(--gn)':'var(--rd)'}">${nm!==null?fmt(nm):'—'}</div></div></div><div style="margin-top:8px;font-size:11px;color:var(--txd)">${d.ingredients.length} ingredientes · ${srv} ración${srv!==1?'es':''}</div></div><div style="padding:8px 16px;border-top:1px solid var(--bd);display:flex;gap:6px"><button class="btn btn-o" style="flex:1;font-size:12px" onclick="openEscDrawer(${d.id},false)">✏️ Editar</button><button class="btn btn-o" style="font-size:12px;color:var(--rd)" onclick="if(dishes.length>1&&confirm('¿Eliminar?')){dishes=dishes.filter(x=>x.id!==${d.id});if(activeDish===${d.id})activeDish=dishes[0].id;renderSel();renderDish();renderRecetas();toast('Eliminada');}else toast('Mínimo una receta')">🗑</button></div></div>`;
+    return `<div class="rec-card"><div style="padding:14px 16px"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:6px"><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;font-weight:400;flex:1">${d.name||'Sin nombre'}</div>${badge}</div>${d.category?`<span style="font-size:10px;background:var(--acd);color:var(--ack);padding:2px 8px;border-radius:10px">${d.category}</span>`:''}<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px"><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">MP/ración</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:var(--ack)">${mp>0?fmt(mp):'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">PVP</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px">${sale>0?fmt(sale):'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">Food cost</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:${fcc}">${fc!==null?fc.toFixed(1)+'%':'—'}</div></div><div style="background:var(--sf2);border-radius:6px;padding:8px 10px"><div style="font-size:9px;text-transform:uppercase;color:var(--txd);margin-bottom:2px">Margen neto</div><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:${nm===null?'var(--txd)':nm>=0?'var(--gn)':'var(--rd)'}">${nm!==null?fmt(nm):'—'}</div></div></div><div style="margin-top:8px;font-size:11px;color:var(--txd)">${d.ingredients.length} ingredientes · ${srv} ración${srv!==1?'es':''}</div></div><div style="padding:8px 16px;border-top:1px solid var(--bd);display:flex;gap:6px"><button class="btn btn-o" style="flex:1;font-size:12px" onclick="openEscDrawer(${d.id},false)">✏️ Editar</button>
+        <button class="btn btn-o" style="font-size:12px" onclick="duplicarReceta(${d.id})" title="Duplicar receta">⧉</button>
+        <button class="btn btn-o" style="font-size:12px" onclick="abrirCalculadora(${d.id})" title="Calculadora de margen">🧮</button>
+        <button class="btn btn-o" style="font-size:12px;color:var(--rd)" onclick="if(dishes.length>1&&confirm('¿Eliminar?')){dishes=dishes.filter(x=>x.id!==${d.id});if(activeDish===${d.id})activeDish=dishes[0].id;renderSel();renderDish();renderRecetas();toast('Eliminada');}else toast('Mínimo una receta')">🗑</button></div></div>`;
   }).join('');
 }
 
@@ -1018,12 +1290,22 @@ async function importFromSumUp(){
 
   try {
     // Fetch products from SumUp catalog
-    const r = await fetch('/api/sumup?path='+encodeURIComponent('/v0.1/merchants/'+merchant+'/products')+'&key='+encodeURIComponent(token));
-    if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||r.status); }
+    // Use OAuth token via header (more secure)
+    const r = await fetch('/api/sumup?path='+encodeURIComponent('/v0.1/merchants/'+merchant+'/products'), {
+      headers: { 'x-sumup-key': token }
+    });
+    if(!r.ok){
+      const e=await r.json().catch(()=>({}));
+      // If products endpoint fails, try catalog endpoint
+      if(r.status===404){
+        if(msg) msg.textContent='ℹ️ No se encontró catálogo de productos en SumUp. Puedes añadirlos manualmente.';
+        return;
+      }
+      throw new Error(e.message||r.status);
+    }
     const data = await r.json();
-
-    // SumUp returns { products: [...] } or array directly
-    const suProducts = data.products || data.items || (Array.isArray(data)?data:[]);
+    // SumUp returns { items: [...] } or { products: [...] } or array
+    const suProducts = data.items || data.products || (Array.isArray(data)?data:[]);
     if(!suProducts.length){
       if(msg) msg.textContent = 'No se encontraron productos en SumUp';
       return;
@@ -1264,7 +1546,11 @@ window.addEventListener('message', function(e) {
     } catch(e) {}
   }
 })();
-function saveWA(){localStorage.setItem('pd_wa',el('waNum').value.trim());toast('WhatsApp guardado ✓');}
+function saveWA(){
+  const num = el('waNum').value.trim() || '34680275560';
+  localStorage.setItem('pd_wa', num);
+  toast('WhatsApp guardado ✓');
+}
 
 // ══ INVENTORY ════════════════════════════════════════════
 function dExp(s){if(!s||s==='no')return null;const d=new Date(s),n=new Date();n.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.round((d-n)/86400000);}
@@ -1310,7 +1596,7 @@ function renderInv(){
   }).join('');
   const tot=inv.reduce((s,i)=>s+(parseFloat(i.stock)||0)*(parseFloat(i.c)||0),0);
   setEl('invTotal',fmt(tot));setEl('invCount',inv.length+' productos');
-  renderAlerts();renderInvSum();autoSave();
+  renderAlerts();renderInvSum();renderInvCatBreakdown();autoSave();
 }
 function addInvItem(){inv.push({id:Date.now(),n:'',cat:'seco',stock:'',u:'kg',min:'',c:'',exp:'',notes:''});renderInv();}
 function setInvF(c,btn){invF=c;invLow=false;document.querySelectorAll('[data-ic]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderInv();}
@@ -1357,16 +1643,16 @@ function renderFlores(){
       <input class="fi r" type="number" placeholder="25" value="${f.tpm||''}" min="1" step="1"
         oninput="floresData.vars[${idx}].tpm=this.value;autoSave()"
         onblur="renderFlores()">
-      <input class="fi r" type="number" placeholder="0,00" value="${p?.pm||''}" min="0" step="0.01" oninput="updP(${idx},'pm',this.value)">
+      <input class="fi r" type="number" placeholder="0,00" value="${p?.pm||''}" min="0" step="0.01" oninput="updPById('${f.id}','pm',this.value)">
       <span class="ptallo" style="color:${ptC}">${pt!==null?pt.toFixed(3)+' €'+dL:'—'}</span>
-      <input class="fi r" type="number" placeholder="0" value="${p?.stock||''}" min="0" step="0.5" oninput="updP(${idx},'stock',this.value)">
+      <input class="fi r" type="number" placeholder="0" value="${p?.stock||''}" min="0" step="0.5" oninput="updPById('${f.id}','stock',this.value)">
       <input class="fi" type="text" placeholder="Temporada" value="${f.temp||''}"
         oninput="floresData.vars[${idx}].temp=this.value;autoSave()"
         onblur="renderFlores()">
       <div style="display:flex;gap:3px;align-items:center"><input class="fi" type="text" placeholder="Cal./Prov." value="${f.cal||''}"
         oninput="floresData.vars[${idx}].cal=this.value;autoSave()"
-        onblur="renderFlores()" style="flex:1"><button class="hist-btn" onclick="verHist(${idx})">📈</button></div>
-      <button class="btn-x" onclick="delFlor(${idx})">×</button>
+        onblur="renderFlores()" style="flex:1"><button class="hist-btn" onclick="verHistById('${f.id}')">📈</button></div>
+      <button class="btn-x" onclick="delFlorById('${f.id}')">×</button>
     </div>`;
   }).join('');
   if(!el('tempList')){const dl=document.createElement('datalist');dl.id='tempList';dl.innerHTML=['Todo el año','Primavera','Verano','Otoño','Invierno'].map(t=>`<option value="${t}">`).join('');document.body.appendChild(dl);}
@@ -1376,7 +1662,33 @@ function renderFlores(){
 }
 function updP(idx,f,v){const fl=floresData.vars[idx];fl.precios=fl.precios||[];let e=fl.precios.find(p=>p.sid===floresData.activa);if(!e){e={sid:floresData.activa,pm:'',stock:'',notes:''};fl.precios.push(e);}e[f]=v;renderFlores();}
 function addFlor(){const sems=floresData.semanas||[];floresData.vars.push({id:'f'+Date.now(),n:'',tipo:'otra',tpm:25,prov:'',temp:'',cal:'',notes:'',precios:sems.map(s=>({sid:s.id,pm:'',stock:'',notes:''}))});renderFlores();setTimeout(()=>{const rs=document.querySelectorAll('#flList .tr-row .fi');if(rs.length)rs[rs.length-8]?.focus();},50);}
-function delFlor(idx){if(!confirm(`¿Eliminar "${floresData.vars[idx].n||'esta variedad'}"?`))return;floresData.vars.splice(idx,1);renderFlores();}
+function delFlor(idx){
+  if(!confirm('¿Eliminar esta variedad?')) return;
+  floresData.vars.splice(idx,1);
+  renderFlores();
+  autoSave();
+}
+function delFlorById(id){
+  const f = floresData.vars.find(function(v){return v.id===id;});
+  if(!f) return;
+  if(!confirm('¿Eliminar "' + (f.n||'esta variedad') + '"?')) return;
+  floresData.vars = floresData.vars.filter(function(v){return v.id!==id;});
+  renderFlores();
+  autoSave();
+}
+function updPById(id, field, val){
+  const f = floresData.vars.find(function(v){return v.id===id;});
+  if(!f) return;
+  f.precios = f.precios||[];
+  var e = f.precios.find(function(p){return p.sid===floresData.activa;});
+  if(!e){ e={sid:floresData.activa,pm:'',stock:'',notes:''}; f.precios.push(e); }
+  e[field]=val;
+  renderFlores();
+}
+function verHistById(id){
+  const idx = floresData.vars.findIndex(function(v){return v.id===id;});
+  if(idx>=0) verHist(idx);
+}
 function setFlF(c,btn){flF=c;document.querySelectorAll('[data-ft]').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFlores();}
 function renderFlSum(){
   const d=el('flSum');if(!d)return;
@@ -1399,7 +1711,7 @@ async function processAlb(ev){
     const mt=isPDF?'application/pdf':(file.type||'image/jpeg');
     setEl('albSt','Enviando a IA para extraer precios…');
     const prompt='Eres un asistente que extrae datos de albaranes de flores de subasta. Analiza este albaran y devuelve SOLO un JSON valido sin texto extra ni backticks con este formato: {"lineas":[{"nombre":"Rosa Talla M","unidades":25,"precioUnitario":0.25,"total":6.25}]}. Si no puedes leer un campo usa null.';
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const resp=await fetch('/api/claude',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[
         isPDF?{type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}}:{type:'image',source:{type:'base64',media_type:mt,data:b64}},
@@ -1459,7 +1771,14 @@ function persist(){
   localStorage.setItem('pd_flores',JSON.stringify(floresData));
   localStorage.setItem('pd_products',JSON.stringify(products));
 }
-function saveAll(){recalc();persist();syncToSupabase();setEl('drawerTitle',getActive()?.name||'Editar receta');renderRecetas();}
+function saveAll(){
+  recalc();
+  registrarCambiosPrecio();
+  persist();
+  syncToSupabase();
+  setEl('drawerTitle',getActive()?.name||'Editar receta');
+  renderRecetas();
+}
 function autoSave(){clearTimeout(window._st);window._st=setTimeout(persist,800);}
 function exportData(){
   const d={version:4,exportedAt:new Date().toISOString(),cfg,dishes,inv,floresData,products};
@@ -1579,6 +1898,8 @@ async function fetchVentas(){
     const items = data.items || data.transactions || [];
     renderVentas(items);
     toast(`✓ ${items.length} transacciones cargadas`);
+    // Load comparativa in background
+    fetchComparativa(items, period, dates);
   } catch(e) {
     toast('❌ Error de conexión: '+e.message);
     console.error(e);
@@ -1596,25 +1917,28 @@ function renderVentas(items){
     setEl('vstTotal','—'); setEl('vstCount','0'); setEl('vstAvg','—');
     setEl('vstCard','—'); setEl('vstCash','—');
     el('ventasTopCard').style.display='none';
+    if(el('ventasComparativa')) el('ventasComparativa').style.display='none';
     return;
   }
 
-  // Calculate stats
-  const total = items.reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const card = items.filter(t=>t.payment_type==='CARD').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const cash = items.filter(t=>t.payment_type==='CASH').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  const avg = items.length ? total/items.length : 0;
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 
-  setEl('vstTotal', total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+  // Global stats
+  const total = items.reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const card  = items.filter(t=>t.payment_type==='CARD').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const cash  = items.filter(t=>t.payment_type==='CASH').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const avg   = items.length ? total/items.length : 0;
+
+  setEl('vstTotal', fmt2(total));
   setEl('vstCount', items.length.toLocaleString('es-ES'));
-  setEl('vstAvg', avg.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
-  setEl('vstCard', card.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
-  setEl('vstCash', cash.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+  setEl('vstAvg',   fmt2(avg));
+  setEl('vstCard',  fmt2(card));
+  setEl('vstCash',  fmt2(cash));
 
   // Top products
   const prodMap = {};
   items.forEach(t=>{
-    const name = t.product_name || t.description || 'Sin descripción';
+    const name = t.product_name||t.description||'Sin descripción';
     if(!prodMap[name]) prodMap[name]={name,count:0,total:0};
     prodMap[name].count++;
     prodMap[name].total+=parseFloat(t.amount)||0;
@@ -1624,45 +1948,129 @@ function renderVentas(items){
     el('ventasTopCard').style.display='block';
     el('ventasTopList').innerHTML = topProds.map((p,i)=>`
       <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--bd);${i===topProds.length-1?'border:none':''}">
-        <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:var(--txd);width:20px;text-align:center">${i+1}</span>
+        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:18px;color:var(--txd);width:20px;text-align:center">${i+1}</span>
         <span style="flex:1;font-size:13px">${p.name}</span>
         <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--txd)">${p.count} venta${p.count!==1?'s':''}</span>
-        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;color:var(--ack)">${p.total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</span>
+        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;color:var(--ack)">${fmt2(p.total)}</span>
       </div>`).join('');
   }
 
-  // Transactions list
   el('ventasEmpty').style.display='none';
-  el('ventasTableHeader').style.display='grid';
+  el('ventasTableHeader').style.display='none'; // hide old header, we use day groups
   setEl('ventasListCount', items.length+' transacciones');
 
-  const statusBadge = s => {
-    if(s==='SUCCESSFUL') return '<span style="font-size:10px;background:var(--gnd);color:var(--gn);padding:2px 8px;border-radius:10px">✓ OK</span>';
-    if(s==='REFUNDED') return '<span style="font-size:10px;background:var(--ord);color:var(--or);padding:2px 8px;border-radius:10px">↩ Dev.</span>';
-    return `<span style="font-size:10px;background:var(--sf2);color:var(--txd);padding:2px 8px;border-radius:10px">${s}</span>`;
-  };
-  const payBadge = p => {
-    if(p==='CARD') return '<span style="font-size:10px;background:var(--bld);color:var(--bl);padding:2px 8px;border-radius:10px">💳 Tarjeta</span>';
-    if(p==='CASH') return '<span style="font-size:10px;background:var(--ord);color:var(--or);padding:2px 8px;border-radius:10px">💵 Efectivo</span>';
-    return `<span style="font-size:10px;background:var(--sf2);color:var(--txd);padding:2px 8px;border-radius:10px">${p||'—'}</span>`;
-  };
+  // Check if period is "month" or "custom" with multiple days -> show daily breakdown
+  const period = el('ventasPeriod')?.value || 'month';
+  const showDayBreakdown = ['month','week','custom'].includes(period);
 
-  el('ventasList').innerHTML = items.map(t=>{
-    const dt = new Date(t.timestamp||t.local_time);
-    const fecha = dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
-    const hora = dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-    return `<div class="tr-row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
-      <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--txd)">${fecha} ${hora}</span>
-      <span style="font-size:13px">${t.product_name||t.description||'Venta'}</span>
-      <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;text-align:right;color:var(--ack)">${parseFloat(t.amount||0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</span>
-      <div style="text-align:center">${payBadge(t.payment_type)}</div>
-      <div style="text-align:center">${statusBadge(t.status)}</div>
-    </div>`;
-  }).join('');
+  if(showDayBreakdown){
+    // Group by day
+    const byDay = {};
+    items.forEach(t=>{
+      const dt = new Date(t.timestamp||t.local_time);
+      const dayKey = dt.toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'2-digit',year:'2-digit'});
+      if(!byDay[dayKey]) byDay[dayKey]={ key:dayKey, date:dt, items:[], card:0, cash:0, total:0 };
+      byDay[dayKey].items.push(t);
+      const amt = parseFloat(t.amount)||0;
+      byDay[dayKey].total += amt;
+      if(t.payment_type==='CARD') byDay[dayKey].card += amt;
+      else if(t.payment_type==='CASH') byDay[dayKey].cash += amt;
+    });
 
-  // Store for CSV export
+    // Sort days descending
+    const days = Object.values(byDay).sort((a,b)=>b.date-a.date);
+
+    el('ventasList').innerHTML = days.map(day=>`
+      <div style="margin-bottom:4px">
+        <!-- Day header -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;padding:9px 14px;background:var(--sf2);border-radius:7px;cursor:pointer;align-items:center"
+          onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+          <span style="font-weight:600;font-size:13px">${day.key}</span>
+          <div style="text-align:right">
+            <span style="font-size:10px;text-transform:uppercase;color:var(--txd);display:block">Efectivo</span>
+            <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;color:var(--or)">${fmt2(day.cash)}</span>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:10px;text-transform:uppercase;color:var(--txd);display:block">Tarjeta</span>
+            <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;color:var(--bl)">${fmt2(day.card)}</span>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:10px;text-transform:uppercase;color:var(--txd);display:block">Total día</span>
+            <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:14px;font-weight:700;color:var(--ack)">${fmt2(day.total)}</span>
+          </div>
+          <div style="text-align:right">
+            <span style="font-size:10px;text-transform:uppercase;color:var(--txd);display:block">${day.items.length} transac.</span>
+            <span style="font-size:11px;color:var(--txd)">▼ Ver detalle</span>
+          </div>
+        </div>
+        <!-- Day transactions (collapsed by default) -->
+        <div style="display:none;margin-top:2px;margin-left:8px">
+          ${day.items.map(t=>{
+            const dt2=new Date(t.timestamp||t.local_time);
+            const hora=dt2.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+            const isCard=t.payment_type==='CARD';
+            return `<div style="display:grid;grid-template-columns:80px 1fr 120px 100px;gap:6px;padding:7px 14px;border-bottom:1px solid var(--bd);align-items:center">
+              <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--txd)">${hora}</span>
+              <span style="font-size:13px">${t.product_name||t.description||'Venta'}</span>
+              <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;text-align:right;color:var(--ack)">${fmt2(parseFloat(t.amount||0))}</span>
+              <div style="text-align:center"><span style="font-size:10px;padding:2px 8px;border-radius:10px;${isCard?'background:var(--bld);color:var(--bl)':'background:var(--ord);color:var(--or)'}">${isCard?'💳 Tarjeta':'💵 Efectivo'}</span></div>
+            </div>`;
+          }).join('')}
+          <!-- Day subtotals row -->
+          <div style="display:grid;grid-template-columns:80px 1fr 120px 100px;gap:6px;padding:8px 14px;background:var(--sf2);border-radius:0 0 6px 6px;margin-top:2px">
+            <span></span>
+            <span style="font-size:11px;color:var(--txd);text-transform:uppercase">Subtotal del día</span>
+            <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:700;text-align:right;color:var(--ack)">${fmt2(day.total)}</span>
+            <div style="text-align:center;font-size:11px;color:var(--txd)">
+              <span style="color:var(--bl)">💳 ${fmt2(day.card)}</span><br>
+              <span style="color:var(--or)">💵 ${fmt2(day.cash)}</span>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+
+    // Grand total row at bottom
+    el('ventasList').innerHTML += `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;padding:12px 14px;background:var(--text);border-radius:8px;margin-top:8px;align-items:center">
+        <span style="font-weight:700;font-size:13px;color:var(--sf)">TOTAL PERIODO</span>
+        <div style="text-align:right"><span style="font-size:10px;color:rgba(255,255,255,.6);display:block;text-transform:uppercase">Efectivo</span><span style="font-family:'Cascadia Code','Consolas',monospace;font-size:14px;font-weight:700;color:var(--or)">${fmt2(cash)}</span></div>
+        <div style="text-align:right"><span style="font-size:10px;color:rgba(255,255,255,.6);display:block;text-transform:uppercase">Tarjeta</span><span style="font-family:'Cascadia Code','Consolas',monospace;font-size:14px;font-weight:700;color:var(--bl)">${fmt2(card)}</span></div>
+        <div style="text-align:right"><span style="font-size:10px;color:rgba(255,255,255,.6);display:block;text-transform:uppercase">Total</span><span style="font-family:'Cascadia Code','Consolas',monospace;font-size:16px;font-weight:700;color:white">${fmt2(total)}</span></div>
+        <div style="text-align:right"><span style="font-size:10px;color:rgba(255,255,255,.6);display:block;text-transform:uppercase">${items.length} transac.</span><span style="font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:rgba(255,255,255,.7)">${fmt2(avg)} media</span></div>
+      </div>`;
+
+  } else {
+    // Today/Yesterday: simple flat list
+    el('ventasTableHeader').style.display='grid';
+    const statusBadge = s => s==='SUCCESSFUL'?'<span style="font-size:10px;background:var(--gnd);color:var(--gn);padding:2px 8px;border-radius:10px">✓ OK</span>':'<span style="font-size:10px;background:var(--sf2);color:var(--txd);padding:2px 8px;border-radius:10px">'+s+'</span>';
+    const payBadge = p => p==='CARD'?'<span style="font-size:10px;background:var(--bld);color:var(--bl);padding:2px 8px;border-radius:10px">💳 Tarjeta</span>':'<span style="font-size:10px;background:var(--ord);color:var(--or);padding:2px 8px;border-radius:10px">💵 Efectivo</span>';
+    el('ventasList').innerHTML = items.map(t=>{
+      const dt=new Date(t.timestamp||t.local_time);
+      const fecha=dt.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
+      const hora=dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="tr-row" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
+        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:11px;color:var(--txd)">${fecha} ${hora}</span>
+        <span style="font-size:13px">${t.product_name||t.description||'Venta'}</span>
+        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;text-align:right;color:var(--ack)">${fmt2(parseFloat(t.amount||0))}</span>
+        <div style="text-align:center">${payBadge(t.payment_type)}</div>
+        <div style="text-align:center">${statusBadge(t.status)}</div>
+      </div>`;
+    }).join('');
+
+    // Summary row for today
+    el('ventasList').innerHTML += `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;padding:10px 14px;background:var(--sf2);border-radius:0 0 8px 8px;margin-top:4px">
+        <span style="font-size:11px;color:var(--txd);text-transform:uppercase">Total</span>
+        <span></span>
+        <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:700;text-align:right;color:var(--ack)">${fmt2(total)}</span>
+        <div style="text-align:center"><span style="font-size:11px;color:var(--bl)">💳 ${fmt2(card)}</span></div>
+        <div style="text-align:center"><span style="font-size:11px;color:var(--or)">💵 ${fmt2(cash)}</span></div>
+      </div>`;
+  }
+
   window._ventasData = items;
 }
+
 
 function exportVentasCSV(){
   const items = window._ventasData;
@@ -1688,12 +2096,1437 @@ function exportVentasCSV(){
   toast('CSV exportado ✓');
 }
 
+
+// ══ DASHBOARD ══════════════════════════════════════════════
+async function loadDashboard(){
+  const now = new Date();
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+
+  // Greeting
+  const h = now.getHours();
+  const greeting = h<13?'Buenos días 🌸':h<20?'Buenas tardes 🌻':'Buenas noches 🌙';
+  setEl('dashGreeting', greeting);
+  setEl('dashDate', now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+
+  // Fixed costs per day
+  const gd = fpd();
+  setEl('dashGastosDia', fmt2(gd));
+
+  // Equilibrio por receta
+  renderDashEquilibrio();
+
+  // Top recetas
+  renderDashTopRecetas();
+
+  // Alertas
+  renderDashAlertas();
+
+  // Flores
+  renderDashFlores();
+
+  // Try to load today's sales from SumUp
+  const token = getSumUpToken() || localStorage.getItem('pd_su_key') || SU_KEY_DEFAULT;
+  if(!token){
+    el('dashSumUpNote').style.display='block';
+    setEl('dashVentasHoy','—');
+    setEl('dashEfectivo','—');
+    setEl('dashTarjeta','—');
+    setEl('dashTicket','—');
+    setEl('dashBeneficio','—');
+    checkAlertaBeneficio(null);
+    return;
+  }
+  el('dashSumUpNote').style.display='none';
+
+  try {
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
+    const qs = 'path='+encodeURIComponent('/v0.1/me/transactions/history')
+      +'&oldest_time='+encodeURIComponent(todayStart.toISOString())
+      +'&newest_time='+encodeURIComponent(todayEnd.toISOString())
+      +'&limit=100&statuses[]=SUCCESSFUL';
+    const r = await fetch('/api/sumup?'+qs, { headers:{'x-sumup-key':token} });
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    const items = data.items || data.transactions || [];
+
+    const total = items.reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+    const card  = items.filter(t=>t.payment_type==='CARD').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+    const cash  = items.filter(t=>t.payment_type==='CASH').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+    const avg   = items.length ? total/items.length : 0;
+    const benef = total - gd;
+
+    setEl('dashVentasHoy', fmt2(total));
+    setEl('dashVentasHoyCount', items.length+' transacciones');
+    setEl('dashEfectivo', fmt2(cash));
+    setEl('dashTarjeta', fmt2(card));
+    setEl('dashTicket', avg>0 ? fmt2(avg) : '—');
+
+    const bEl = el('dashBeneficio');
+    if(bEl){ bEl.textContent=fmt2(benef); bEl.style.color=benef>=0?'var(--gn)':'var(--rd)'; }
+    checkAlertaBeneficio(total);
+
+  } catch(e){
+    setEl('dashVentasHoy','Error');
+    console.log('Dashboard SumUp error:', e.message);
+  }
+}
+
+function renderDashTopRecetas(){
+  const fd = fpd();
+  const ranked = dishes.map(d=>{
+    const mp = d.ingredients.reduce((s,i)=>s+(parseFloat(i.q)||0)*(parseFloat(i.c)||0),0) / (d.servings||1);
+    const sale = parseFloat(d.salePrice)||0;
+    const ds = parseFloat(d.dailySales)||0;
+    const fps = ds>0 ? fd/ds : null;
+    const nm = (sale>0&&fps!==null) ? sale-mp-fps : null;
+    const fc = sale>0 ? (mp/sale*100) : null;
+    return {name:d.name, cat:d.category, nm, fc, sale};
+  }).filter(d=>d.nm!==null).sort((a,b)=>b.nm-a.nm).slice(0,5);
+
+  const div = el('dashTopRecetas');
+  if(!div) return;
+  if(!ranked.length){ div.innerHTML='<div style="color:var(--txd);font-size:13px;text-align:center;padding:16px">Introduce PVP y raciones/día en tus recetas</div>'; return; }
+
+  div.innerHTML = ranked.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);${i===ranked.length-1?'border:none':''}">
+      <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:var(--txd);width:18px">${i+1}</span>
+      <div style="flex:1">
+        <div style="font-size:13px">${r.name}</div>
+        ${r.cat?`<div style="font-size:10px;color:var(--txd)">${r.cat}</div>`:''}
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Cascadia Code','Consolas',monospace;font-size:13px;font-weight:600;color:var(--gn)">${r.nm.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div>
+        <div style="font-size:10px;color:var(--txd)">margen neto</div>
+      </div>
+      <div style="width:50px;text-align:right">
+        <span style="font-size:11px;padding:2px 7px;border-radius:10px;${r.fc<=30?'background:var(--gnd);color:var(--gn)':r.fc<=40?'background:var(--ord);color:var(--or)':'background:var(--rdd);color:var(--rd)'}">${r.fc.toFixed(0)}%</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderDashEquilibrio(){
+  const div = el('dashEquilibrio');
+  if(!div) return;
+  const fd = fpd();
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+
+  // Best recipe for breakeven calculation
+  const withContrib = dishes.map(d=>{
+    const mp = d.ingredients.reduce((s,i)=>s+(parseFloat(i.q)||0)*(parseFloat(i.c)||0),0) / (d.servings||1);
+    const sale = parseFloat(d.salePrice)||0;
+    const contrib = sale - mp;
+    return {name:d.name, contrib, sale, beD: contrib>0 ? fd/contrib : null};
+  }).filter(d=>d.beD!==null).sort((a,b)=>a.beD-b.beD);
+
+  if(!withContrib.length){
+    div.innerHTML='<div style="color:var(--txd);font-size:13px;text-align:center;padding:16px">Introduce PVP en tus recetas para calcular el equilibrio</div>';
+    return;
+  }
+
+  div.innerHTML = `
+    <div style="text-align:center;padding:10px 0 16px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--txd);margin-bottom:4px">Gastos fijos hoy</div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;color:var(--rd)">${fmt2(fd)}</div>
+    </div>
+    <div style="border-top:1px solid var(--bd);padding-top:12px">
+      ${withContrib.slice(0,4).map(r=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd)">
+          <div style="font-size:12px;flex:1">${r.name}</div>
+          <div style="text-align:right">
+            <span style="font-family:'Cascadia Code','Consolas',monospace;font-size:14px;font-weight:700;color:var(--ack)">${Math.ceil(r.beD)}</span>
+            <span style="font-size:10px;color:var(--txd)"> rac/día</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:11px;color:var(--txd);margin-top:8px;text-align:center">Raciones mínimas para cubrir los gastos del día</div>`;
+}
+
+function renderDashAlertas(){
+  const div = el('dashAlertas');
+  if(!div) return;
+  const alerts = [];
+
+  // Inventory alerts
+  inv.forEach(it=>{
+    const d = dExp(it.exp);
+    if(d!==null&&d<0) alerts.push({type:'error', msg:`<strong>${it.n}</strong> — producto caducado`});
+    else if(d!==null&&d<=3) alerts.push({type:'warn', msg:`<strong>${it.n}</strong> — caduca en ${d} día${d!==1?'s':''}`});
+    if((parseFloat(it.stock)||0)<=(parseFloat(it.min)||0)&&parseFloat(it.min)>0)
+      alerts.push({type:'info', msg:`<strong>${it.n}</strong> — stock bajo (${it.stock} ${it.u})`});
+  });
+
+  // Flores price alerts
+  floresData.vars.forEach(f=>{
+    const pt=getPT(f), pa=getPTant(f);
+    if(pt!==null&&pa!==null&&pt>pa*1.15)
+      alerts.push({type:'warn', msg:`<strong>${f.n}</strong> — precio subió +${Math.round((pt/pa-1)*100)}% esta semana`});
+  });
+
+  // Check upcoming client dates
+  if(typeof clientes !== 'undefined'){
+    clientes.forEach(c=>{
+      const checks = [
+        {label:'Cumpleaños', date:c.cumple, nombre:c.nombre},
+        {label:'Aniversario', date:c.aniversario, nombre:c.nombre},
+      ];
+      checks.forEach(({label,date,nombre})=>{
+        const days = typeof daysUntilNextOccurrence==='function' ? daysUntilNextOccurrence(date) : null;
+        if(days!==null && days<=7){
+          alerts.push({type:'info', msg:`<strong>${nombre}</strong> — ${label} ${days===0?'¡hoy!':'en '+days+' día'+(days!==1?'s':'')}`});
+        }
+      });
+    });
+  }
+
+  // Check fixed costs vs estimated revenue
+  const fdCheck = fpd();
+  const estRev = dishes.reduce((s,d)=>{
+    const mp=d.ingredients.reduce((a,i)=>a+(parseFloat(i.q)||0)*(parseFloat(i.c)||0),0)/(d.servings||1);
+    const sale=parseFloat(d.salePrice)||0;
+    const ds=parseFloat(d.dailySales)||0;
+    return s+(sale>0&&ds>0?sale*ds:0);
+  },0);
+  if(estRev>0&&estRev<fdCheck){
+    alerts.unshift({type:'error', msg:`Facturación estimada del día (<strong>${estRev.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</strong>) por debajo de gastos fijos (<strong>${fdCheck.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</strong>)`});
+  }
+
+  if(!alerts.length){
+    div.innerHTML='<div style="color:var(--gn);font-size:13px;text-align:center;padding:16px 0">✓ Todo en orden hoy</div>';
+    return;
+  }
+
+  div.innerHTML = alerts.slice(0,6).map(a=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);font-size:12px">
+      <span>${a.type==='error'?'🚨':a.type==='warn'?'⚠️':'📦'}</span>
+      <span style="color:var(--tx)">${a.msg}</span>
+    </div>`).join('');
+}
+
+function renderDashFlores(){
+  const div = el('dashFlores');
+  if(!div) return;
+  const vars = floresData.vars;
+  if(!vars.length){ div.innerHTML='<div style="color:var(--txd);font-size:13px;text-align:center;padding:16px">Sin variedades registradas</div>'; return; }
+
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const semActiva = floresData.semanas.find(s=>s.id===floresData.activa);
+
+  div.innerHTML = `
+    <div style="font-size:11px;color:var(--txd);margin-bottom:10px">${semActiva?semActiva.label:'Semana actual'}</div>
+    ${vars.slice(0,6).map(f=>{
+      const p=getPV(f);
+      const pt=getPT(f);
+      const stock=parseFloat(p?.stock)||0;
+      const stockVal=stock*(parseFloat(p?.pm)||0);
+      return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">
+        <div style="flex:1;font-size:12px">${f.n}</div>
+        <div style="text-align:right">
+          <div style="font-family:'Cascadia Code','Consolas',monospace;font-size:12px;color:var(--gn)">${pt!==null?pt.toFixed(3)+' €/tallo':'—'}</div>
+          <div style="font-size:10px;color:var(--txd)">${stock>0?stock+' manojos':'sin stock'}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    ${vars.length>6?`<div style="font-size:11px;color:var(--txd);text-align:center;margin-top:6px">+${vars.length-6} más en Flores</div>`:''}`;
+}
+
+
+// ══ PEDIDOS ════════════════════════════════════════════════
+const ESTADOS = {
+  pendiente:   {label:'Pendiente',    color:'var(--or)',  bg:'var(--ord)',  icon:'🕐'},
+  en_proceso:  {label:'En proceso',   color:'var(--bl)',  bg:'var(--bld)',  icon:'🔧'},
+  listo:       {label:'Listo ✓',      color:'var(--gn)',  bg:'var(--gnd)',  icon:'✅'},
+  entregado:   {label:'Entregado',    color:'var(--txd)', bg:'var(--sf2)',  icon:'📦'},
+  cancelado:   {label:'Cancelado',    color:'var(--rd)',  bg:'var(--rdd)',  icon:'❌'},
+};
+
+function renderPedidos(){
+  const q = (el('pedidosSearch')?.value||'').toLowerCase();
+  const filtro = el('pedidosFilter')?.value || 'todos';
+  let items = pedidos.slice();
+
+  if(filtro !== 'todos') items = items.filter(p=>p.estado===filtro);
+  if(q) items = items.filter(p=>
+    (p.cliente||'').toLowerCase().includes(q) ||
+    (p.desc||'').toLowerCase().includes(q)
+  );
+
+  // Sort: pending first by date, then delivered
+  items.sort((a,b)=>{
+    const order = {pendiente:0,en_proceso:1,listo:2,entregado:3,cancelado:4};
+    if(order[a.estado]!==order[b.estado]) return order[a.estado]-order[b.estado];
+    return new Date(a.fecha||0)-new Date(b.fecha||0);
+  });
+
+  // Summary
+  const sum = el('pedidosSummary');
+  if(sum){
+    const pend = pedidos.filter(p=>p.estado==='pendiente').length;
+    const proc = pedidos.filter(p=>p.estado==='en_proceso').length;
+    const list = pedidos.filter(p=>p.estado==='listo').length;
+    const totalEur = pedidos.filter(p=>p.estado!=='cancelado').reduce((s,p)=>s+(parseFloat(p.importe)||0),0);
+    sum.innerHTML = `
+      <div class="stat-cell"><span class="sv" style="color:var(--or)">${pend}</span><span class="sl">Pendientes</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--bl)">${proc}</span><span class="sl">En proceso</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--gn)">${list}</span><span class="sl">Listos</span></div>
+      <div class="stat-cell"><span class="sv">${pedidos.length}</span><span class="sl">Total pedidos</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--ack)">${totalEur.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</span><span class="sl">Facturación total</span></div>`;
+  }
+
+  const list = el('pedidosList');
+  if(!items.length){
+    list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--txd);font-size:14px">
+      ${pedidos.length===0?'No hay pedidos todavía.<br><br><button class="btn btn-p" onclick="abrirNuevoPedido()">+ Crear primer pedido</button>':'Sin resultados para este filtro'}
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(p=>{
+    const est = ESTADOS[p.estado] || ESTADOS.pendiente;
+    const fecha = p.fecha ? new Date(p.fecha).toLocaleDateString('es-ES',{weekday:'short',day:'2-digit',month:'2-digit',year:'2-digit'}) : '—';
+    const hora = p.hora || '';
+    const diasRestantes = p.fecha ? Math.round((new Date(p.fecha)-new Date())/(1000*60*60*24)) : null;
+    let fechaColor = 'var(--txd)';
+    if(diasRestantes!==null && p.estado!=='entregado' && p.estado!=='cancelado'){
+      if(diasRestantes<0) fechaColor='var(--rd)';
+      else if(diasRestantes<=2) fechaColor='var(--or)';
+      else if(diasRestantes<=7) fechaColor='var(--ac)';
+    }
+    const wa = p.telefono ? `https://wa.me/34${p.telefono.replace(/\D/g,'')}?text=${encodeURIComponent('Hola '+p.cliente+'! Tu pedido está listo.')}` : null;
+
+    return `<div class="card" style="margin-bottom:10px;transition:all .2s" onmouseenter="this.style.boxShadow='0 4px 16px rgba(0,0,0,.08)'" onmouseleave="this.style.boxShadow=''">
+      <div style="padding:14px 18px">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:400">${p.cliente||'Sin nombre'}</span>
+              <span style="font-size:11px;padding:2px 9px;border-radius:10px;background:${est.bg};color:${est.color}">${est.icon} ${est.label}</span>
+            </div>
+            ${p.desc?`<div style="font-size:13px;color:var(--txd);margin-bottom:4px">${p.desc}</div>`:''}
+            ${p.notas?`<div style="font-size:11px;color:var(--txd);font-style:italic">📝 ${p.notas}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:120px">
+            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:var(--ack)">${p.importe?parseFloat(p.importe).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'—'}</div>
+            <div style="font-size:12px;color:${fechaColor}">📅 ${fecha}${hora?' '+hora:''}</div>
+            ${diasRestantes!==null&&p.estado!=='entregado'&&p.estado!=='cancelado'?`<div style="font-size:11px;color:${fechaColor}">${diasRestantes<0?'⚠ '+Math.abs(diasRestantes)+'d de retraso':diasRestantes===0?'🔔 Hoy':'En '+diasRestantes+'d'}</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd);flex-wrap:wrap">
+          <button class="btn btn-o" onclick="editarPedido('${p.id}')" style="font-size:12px">✏️ Editar</button>
+          <div style="position:relative;display:inline-block">
+            <select class="fib" onchange="cambiarEstado('${p.id}',this.value)" style="font-size:12px;appearance:none;padding-right:24px;height:32px">
+              ${Object.entries(ESTADOS).map(([k,v])=>`<option value="${k}" ${p.estado===k?'selected':''}>${v.icon} ${v.label}</option>`).join('')}
+            </select>
+            <span style="position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--txd);pointer-events:none;font-size:10px">▾</span>
+          </div>
+          ${wa&&p.estado==='listo'?`<a href="${wa}" target="_blank" class="btn btn-gn" style="font-size:12px;text-decoration:none">💬 Avisar por WA</a>`:''}
+          ${p.telefono?`<a href="tel:${p.telefono}" class="btn btn-o" style="font-size:12px;text-decoration:none">📞 Llamar</a>`:''}
+          <button class="btn btn-o" onclick="eliminarPedido('${p.id}')" style="font-size:12px;color:var(--rd);margin-left:auto">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirNuevoPedido(){
+  pedidoEditId = null;
+  setEl('pedidoModalTitle','Nuevo pedido');
+  el('pedCliente').value=''; el('pedTelefono').value='';
+  el('pedFecha').value=new Date().toISOString().slice(0,10);
+  el('pedHora').value='';
+  el('pedImporte').value=''; el('pedEstado').value='pendiente';
+  el('pedDesc').value=''; el('pedNotas').value='';
+  el('pedidoOverlay').classList.add('on');
+  setTimeout(()=>el('pedCliente').focus(), 100);
+}
+
+function editarPedido(id){
+  const p = pedidos.find(x=>x.id===id);
+  if(!p) return;
+  pedidoEditId = id;
+  setEl('pedidoModalTitle','Editar pedido');
+  el('pedCliente').value=p.cliente||'';
+  el('pedTelefono').value=p.telefono||'';
+  el('pedFecha').value=p.fecha||'';
+  el('pedHora').value=p.hora||'';
+  el('pedImporte').value=p.importe||'';
+  el('pedEstado').value=p.estado||'pendiente';
+  el('pedDesc').value=p.desc||'';
+  el('pedNotas').value=p.notas||'';
+  el('pedidoOverlay').classList.add('on');
+}
+
+function guardarPedido(){
+  const cliente = el('pedCliente').value.trim();
+  if(!cliente){ toast('El nombre del cliente es obligatorio'); return; }
+  const pedido = {
+    id: pedidoEditId || 'p'+Date.now(),
+    cliente,
+    telefono: el('pedTelefono').value.trim(),
+    fecha: el('pedFecha').value,
+    hora: el('pedHora').value,
+    importe: el('pedImporte').value,
+    estado: el('pedEstado').value,
+    desc: el('pedDesc').value.trim(),
+    notas: el('pedNotas').value.trim(),
+    createdAt: pedidoEditId ? (pedidos.find(p=>p.id===pedidoEditId)?.createdAt||new Date().toISOString()) : new Date().toISOString()
+  };
+  if(pedidoEditId){
+    const idx = pedidos.findIndex(p=>p.id===pedidoEditId);
+    if(idx>=0) pedidos[idx]=pedido;
+  } else {
+    pedidos.push(pedido);
+  }
+  localStorage.setItem('pd_pedidos', JSON.stringify(pedidos));
+  cerrarPedido();
+  renderPedidos();
+  toast(pedidoEditId?'Pedido actualizado ✓':'Pedido creado ✓');
+}
+
+function cerrarPedido(){
+  el('pedidoOverlay').classList.remove('on');
+  pedidoEditId = null;
+}
+
+function cambiarEstado(id, estado){
+  const p = pedidos.find(x=>x.id===id);
+  if(p){ p.estado=estado; localStorage.setItem('pd_pedidos',JSON.stringify(pedidos)); renderPedidos(); toast('Estado actualizado'); }
+}
+
+function eliminarPedido(id){
+  const p = pedidos.find(x=>x.id===id);
+  if(!confirm('¿Eliminar pedido de "'+(p?.cliente||'este cliente')+'"?')) return;
+  pedidos = pedidos.filter(x=>x.id!==id);
+  localStorage.setItem('pd_pedidos', JSON.stringify(pedidos));
+  renderPedidos();
+  toast('Pedido eliminado');
+}
+
+
+// ══ LISTA DE LA COMPRA ══════════════════════════════════════
+function renderCompra(){
+  // Auto items from low stock
+  const bajos = inv.filter(i =>
+    (parseFloat(i.stock)||0) <= (parseFloat(i.min)||0) && parseFloat(i.min) > 0 && i.exp !== 'no'
+  );
+
+  // Summary
+  const sum = el('compraSummary');
+  if(sum){
+    const completados = compraExtra.filter(c=>c.done).length;
+    sum.innerHTML = `
+      <div class="stat-cell"><span class="sv" style="color:var(--rd)">${bajos.length}</span><span class="sl">Stock bajo</span></div>
+      <div class="stat-cell"><span class="sv">${compraExtra.length}</span><span class="sl">Artículos extra</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--gn)">${completados}</span><span class="sl">Completados</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--ack)">${bajos.length + compraExtra.filter(c=>!c.done).length}</span><span class="sl">Total pendiente</span></div>`;
+  }
+
+  setEl('compraBajoCount', bajos.length + ' productos');
+
+  // Auto list
+  const bl = el('compraBajoList');
+  if(bl){
+    if(!bajos.length){
+      bl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--gn);font-size:13px">✓ Todo el inventario está por encima del mínimo</div>';
+    } else {
+      bl.innerHTML = bajos.map(it => {
+        const deficit = (parseFloat(it.min)||0) - (parseFloat(it.stock)||0);
+        const catColors = {perecedero:'var(--rd)',seco:'var(--or)',liquido:'var(--bl)',packaging:'var(--ac)',otro:'var(--txd)'};
+        return `<div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bd)">
+          <div style="width:8px;height:8px;border-radius:50%;background:${catColors[it.cat]||'var(--txd)'};flex-shrink:0"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500">${it.n}</div>
+            <div style="font-size:11px;color:var(--txd)">Stock actual: <strong style="color:var(--rd)">${it.stock} ${it.u}</strong> · Mínimo: ${it.min} ${it.u}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:var(--or)">+${deficit.toFixed(2)} ${it.u}</div>
+            <div style="font-size:10px;color:var(--txd)">a reponer</div>
+          </div>
+          <button class="btn btn-o" onclick="marcarRepuesto('${it.id||it.n}')" style="font-size:12px;color:var(--gn);border-color:var(--gn)">✓ Repuesto</button>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  setEl('compraManualCount', compraExtra.length + ' artículos');
+
+  // Manual list
+  const ml = el('compraManualList');
+  if(ml){
+    if(!compraExtra.length){
+      ml.innerHTML = '<div style="padding:16px 18px;color:var(--txd);font-size:13px">Sin artículos adicionales</div>';
+    } else {
+      ml.innerHTML = compraExtra.map((c,i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--bd);${c.done?'opacity:.5':''}">
+          <input type="checkbox" ${c.done?'checked':''} onchange="toggleCompraItem(${i})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--gn)">
+          <div style="flex:1">
+            <input class="fi" type="text" value="${c.name}" placeholder="Artículo…"
+              oninput="compraExtra[${i}].name=this.value;saveCompra()"
+              style="${c.done?'text-decoration:line-through;color:var(--txd)':''}">
+          </div>
+          <input class="fi r" type="text" value="${c.qty||''}" placeholder="Cantidad"
+            oninput="compraExtra[${i}].qty=this.value;saveCompra()" style="width:100px">
+          <button class="btn-x" onclick="compraExtra.splice(${i},1);saveCompra();renderCompra()">×</button>
+        </div>`).join('');
+    }
+  }
+}
+
+function addCompraManual(){
+  compraExtra.push({name:'', qty:'', done:false});
+  saveCompra();
+  renderCompra();
+  // Focus new item
+  setTimeout(()=>{
+    const inputs = document.querySelectorAll('#compraManualList .fi');
+    if(inputs.length) inputs[inputs.length-2].focus();
+  }, 50);
+}
+
+function toggleCompraItem(i){
+  compraExtra[i].done = !compraExtra[i].done;
+  saveCompra();
+  renderCompra();
+}
+
+function marcarRepuesto(id){
+  // Update inventory stock to minimum
+  const item = inv.find(x=>(x.id||x.n)===id||x.id===parseInt(id));
+  if(item && confirm('¿Marcar "'+item.n+'" como repuesto? Se actualizará el stock al mínimo.')){
+    item.stock = item.min;
+    autoSave();
+    renderInv();
+    renderCompra();
+    toast('Stock de "'+item.n+'" actualizado al mínimo');
+  }
+}
+
+function clearCompraCompletados(){
+  if(!compraExtra.filter(c=>c.done).length){ toast('No hay artículos completados'); return; }
+  if(!confirm('¿Eliminar todos los artículos marcados como completados?')) return;
+  compraExtra = compraExtra.filter(c=>!c.done);
+  saveCompra();
+  renderCompra();
+  toast('Completados eliminados ✓');
+}
+
+function saveCompra(){
+  localStorage.setItem('pd_compra', JSON.stringify(compraExtra));
+}
+
+function printCompra(){
+  const bajos = inv.filter(i=>
+    (parseFloat(i.stock)||0)<=(parseFloat(i.min)||0) && parseFloat(i.min)>0 && i.exp!=='no'
+  );
+  const fecha = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const win = window.open('','_blank','width=600,height=800');
+  win.document.write(`<html><head><title>Lista de la compra — Pandivina</title>
+  <style>
+    body{font-family:Georgia,serif;max-width:560px;margin:40px auto;color:#2a2420}
+    h1{font-size:28px;font-weight:300;margin-bottom:4px}
+    .fecha{font-size:12px;color:#9a8880;margin-bottom:24px}
+    h2{font-size:14px;text-transform:uppercase;letter-spacing:.1em;color:#9a8880;margin:20px 0 10px;border-bottom:1px solid #e8ddd5;padding-bottom:6px}
+    .item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0eae4}
+    .check{width:18px;height:18px;border:2px solid #d4847a;border-radius:4px;flex-shrink:0}
+    .name{flex:1;font-size:15px}
+    .qty{font-size:13px;color:#9a8880}
+    @media print{body{margin:20px}}
+  </style></head><body>
+  <h1>🌸 Lista de la compra</h1>
+  <div class="fecha">Pandivina · ${fecha}</div>
+  ${bajos.length?`<h2>Stock bajo — reponer</h2>
+  ${bajos.map(it=>`<div class="item"><div class="check"></div><div class="name">${it.n}</div><div class="qty">${((parseFloat(it.min)||0)-(parseFloat(it.stock)||0)).toFixed(2)} ${it.u}</div></div>`).join('')}`:''}
+  ${compraExtra.filter(c=>!c.done).length?`<h2>Artículos adicionales</h2>
+  ${compraExtra.filter(c=>!c.done).map(c=>`<div class="item"><div class="check"></div><div class="name">${c.name||'—'}</div><div class="qty">${c.qty||''}</div></div>`).join('')}`:''}
+  <scr'+'ipt>window.onload=function(){window.print();}</scr'+'ipt>
+  </body></html>`);
+  win.document.close();
+}
+
+
+// ══ DUPLICAR RECETA + CALCULADORA ══════════════════════════
+function duplicarReceta(id){
+  const orig = dishes.find(d=>d.id===id);
+  if(!orig) return;
+  const copia = JSON.parse(JSON.stringify(orig));
+  copia.id = Date.now();
+  copia.name = copia.name + ' (copia)';
+  dishes.push(copia);
+  autoSave();
+  renderRecetas();
+  toast('Receta duplicada: "' + copia.name + '"');
+}
+
+let calcDishId = null;
+
+function abrirCalculadora(id){
+  const d = dishes.find(x=>x.id===id);
+  if(!d) return;
+  calcDishId = id;
+
+  const mpTot = d.ingredients.reduce((s,i)=>s+(parseFloat(i.q)||0)*(parseFloat(i.c)||0),0);
+  const srv = d.servings||1;
+  const mp = mpTot/srv;
+  const ds = parseFloat(d.dailySales)||0;
+  const fps = ds>0 ? fpd()/ds : 0;
+
+  setEl('calcRecetaNombre', d.name + ' · ' + srv + ' ración' + (srv!==1?'es':''));
+  el('calcMP').value = mp.toFixed(3);
+  el('calcFijos').value = fps.toFixed(3);
+  el('calcMargenPct').value = '30';
+  el('calcSlider').value = '30';
+  setEl('calcSliderVal','30%');
+  el('calcPVP').value = d.salePrice||'';
+
+  calcMargen();
+  el('calcOverlay').classList.add('on');
+}
+
+function calcMargen(){
+  const mp   = parseFloat(el('calcMP')?.value)||0;
+  const fij  = parseFloat(el('calcFijos')?.value)||0;
+  const pct  = parseFloat(el('calcMargenPct')?.value)||30;
+  const tc   = mp + fij; // total cost
+
+  // PVP so that margin% on selling price = pct
+  // margin% = (PVP - tc) / PVP * 100  =>  PVP = tc / (1 - pct/100)
+  const pvpSug = pct < 100 ? tc / (1 - pct/100) : 0;
+  const mb  = pvpSug - mp;
+  const mn  = pvpSug - tc;
+  const fc  = pvpSug > 0 ? (mp/pvpSug*100) : 0;
+
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+
+  setEl('calcResPVP', pvpSug>0 ? fmt2(pvpSug) : '—');
+  setEl('calcResMB',  mb>0     ? fmt2(mb)      : '—');
+
+  const mnEl = el('calcResMN');
+  if(mnEl){ mnEl.textContent = mn>0?fmt2(mn):'—'; mnEl.style.color=mn>0?'var(--gn)':'var(--rd)'; }
+
+  const fcEl = el('calcResFC');
+  if(fcEl){ fcEl.textContent = fc>0?fc.toFixed(1)+'%':'—'; fcEl.style.color=fc<=30?'var(--gn)':fc<=40?'var(--or)':'var(--rd)'; }
+
+  // Sync slider
+  const sl = el('calcSlider');
+  if(sl && sl.value !== String(Math.round(pct))) sl.value = Math.round(pct);
+  setEl('calcSliderVal', Math.round(pct)+'%');
+}
+
+function calcDesdePVP(){
+  const mp  = parseFloat(el('calcMP')?.value)||0;
+  const fij = parseFloat(el('calcFijos')?.value)||0;
+  const pvp = parseFloat(el('calcPVP')?.value)||0;
+  if(!pvp||!mp) return;
+  const tc  = mp+fij;
+  const pct = (pvp-tc)/pvp*100;
+  el('calcMargenPct').value = pct.toFixed(1);
+  if(el('calcSlider')) el('calcSlider').value = Math.min(80,Math.max(5,Math.round(pct)));
+  calcMargen();
+}
+
+function aplicarPVP(){
+  const pvp = parseFloat(el('calcResPVP')?.textContent)||0;
+  if(!pvp||!calcDishId){ toast('No hay PVP calculado'); return; }
+  const d = dishes.find(x=>x.id===calcDishId);
+  if(!d) return;
+  d.salePrice = pvp.toFixed(2);
+  autoSave();
+  renderRecetas();
+  cerrarCalc();
+  toast('PVP ' + pvp.toFixed(2) + ' € aplicado a "' + d.name + '"');
+}
+
+function cerrarCalc(){
+  el('calcOverlay').classList.remove('on');
+  calcDishId = null;
+}
+
+
+// ══ COMPARATIVA VENTAS ══════════════════════════════════════
+async function fetchComparativa(currentItems, period, dates){
+  const token = getSumUpToken() || localStorage.getItem('pd_su_key') || SU_KEY_DEFAULT;
+  if(!token) return;
+
+  // Calculate previous period dates
+  const from = new Date(dates.from);
+  const to   = new Date(dates.to);
+  const diff = to - from;
+  const prevTo   = new Date(from.getTime() - 1);
+  const prevFrom = new Date(from.getTime() - diff - 1);
+
+  let periodLabel = '';
+  if(period==='today')        periodLabel = 'vs ayer';
+  else if(period==='yesterday') periodLabel = 'vs antes de ayer';
+  else if(period==='week')    periodLabel = 'vs semana anterior';
+  else if(period==='month')   periodLabel = 'vs mes anterior';
+  else                        periodLabel = 'vs periodo anterior';
+
+  setEl('compPeriodoLabel', periodLabel);
+
+  try {
+    const qs = 'path='+encodeURIComponent('/v0.1/me/transactions/history')
+      +'&oldest_time='+encodeURIComponent(prevFrom.toISOString())
+      +'&newest_time='+encodeURIComponent(prevTo.toISOString())
+      +'&limit=100&statuses[]=SUCCESSFUL';
+    const r = await fetch('/api/sumup?'+qs, { headers:{'x-sumup-key':token} });
+    if(!r.ok) return;
+    const data = await r.json();
+    const prevItems = data.items || data.transactions || [];
+
+    const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+    const fmtDiff = (curr, prev) => {
+      if(!prev) return '';
+      const pct = ((curr-prev)/prev*100);
+      const arrow = pct>=0 ? '▲' : '▼';
+      const color = pct>=0 ? 'var(--gn)' : 'var(--rd)';
+      return `<span style="color:${color}">${arrow} ${Math.abs(pct).toFixed(1)}%</span> <span style="color:var(--txd)">vs ${fmt2(prev)}</span>`;
+    };
+
+    const currTotal = currentItems.reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+    const prevTotal = prevItems.reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+    const currAvg   = currentItems.length ? currTotal/currentItems.length : 0;
+    const prevAvg   = prevItems.length    ? prevTotal/prevItems.length    : 0;
+
+    setEl('compTotal',  fmt2(currTotal));
+    setEl('compCount',  currentItems.length.toString());
+    setEl('compTicket', currAvg>0 ? fmt2(currAvg) : '—');
+    setEl('compAnt',    fmt2(prevTotal));
+    setEl('compAntLabel', prevItems.length + ' transacciones');
+
+    el('compTotalDiff').innerHTML  = fmtDiff(currTotal, prevTotal);
+    el('compCountDiff').innerHTML  = fmtDiff(currentItems.length, prevItems.length);
+    el('compTicketDiff').innerHTML = fmtDiff(currAvg, prevAvg);
+
+    el('ventasComparativa').style.display = 'block';
+  } catch(e) {
+    console.log('Comparativa error:', e.message);
+  }
+}
+
+
+// ══ ALERTA BENEFICIO ════════════════════════════════════════
+function checkAlertaBeneficio(ventasHoy){
+  const gd = fpd();
+  const banner = el('alertaBeneficio');
+  const msg = el('alertaBeneficioMsg');
+  if(!banner||!msg) return;
+
+  if(ventasHoy === null || ventasHoy === undefined){
+    // Can't check without sales data
+    banner.style.display = 'none';
+    return;
+  }
+
+  const diff = ventasHoy - gd;
+  const pct  = gd > 0 ? (ventasHoy/gd*100) : 100;
+
+  if(diff < 0){
+    // Below fixed costs
+    const falta = Math.abs(diff).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+    msg.innerHTML = `Las ventas de hoy (<strong>${ventasHoy.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</strong>) no cubren los gastos fijos del día (<strong>${gd.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</strong>). Faltan <strong>${falta} €</strong> para el punto de equilibrio.`;
+    banner.style.display = 'flex';
+  } else if(pct < 120){
+    // Close to the limit - warning
+    const sobre = diff.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+    banner.style.display = 'flex';
+    banner.style.background = 'var(--ord)';
+    banner.style.borderBottomColor = 'var(--or)';
+    msg.style.color = 'var(--or)';
+    msg.innerHTML = `⚠️ Ventas de hoy por encima de gastos fijos por solo <strong>${sobre} €</strong>. Margen ajustado (${pct.toFixed(0)}% cubierto).`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+
+// ══ HISTORIAL PRECIOS INGREDIENTES ══════════════════════════
+function registrarCambiosPrecio(){
+  const hoy = new Date().toISOString().slice(0,10);
+  let changed = false;
+
+  dishes.forEach(d => {
+    d.ingredients.forEach(ing => {
+      const key = (ing.n||'').trim().toLowerCase();
+      if(!key || !ing.c) return;
+      const precio = parseFloat(ing.c);
+      if(isNaN(precio)) return;
+
+      if(!preciosHist[key]) preciosHist[key] = [];
+      const hist = preciosHist[key];
+      const last = hist[hist.length-1];
+
+      // Only record if price changed or no history yet
+      if(!last || Math.abs(last.precio - precio) > 0.0001){
+        hist.push({
+          fecha: hoy,
+          precio,
+          receta: d.name,
+          anterior: last ? last.precio : null
+        });
+        // Keep max 50 records per ingredient
+        if(hist.length > 50) hist.shift();
+        changed = true;
+      }
+    });
+  });
+
+  if(changed){
+    localStorage.setItem('pd_precios_hist', JSON.stringify(preciosHist));
+  }
+}
+
+function verHistorialPrecios(){
+  // Build a summary of all ingredients with price changes
+  const ingList = Object.entries(preciosHist)
+    .filter(([k,v]) => v.length > 1)
+    .map(([k,v]) => {
+      const last = v[v.length-1];
+      const prev = v[v.length-2];
+      const diff = last.precio - prev.precio;
+      const pct  = prev.precio > 0 ? (diff/prev.precio*100) : 0;
+      return { name: k, hist: v, last, prev, diff, pct };
+    })
+    .sort((a,b) => Math.abs(b.pct) - Math.abs(a.pct));
+
+  const win = window.open('','_blank','width=700,height:700');
+  const fmt3 = n => n.toLocaleString('es-ES',{minimumFractionDigits:3,maximumFractionDigits:3});
+
+  win.document.write(`<html><head><title>Historial de precios — Pandivina</title>
+  <style>
+    body{font-family:Georgia,serif;max-width:660px;margin:40px auto;color:#2a2420;font-size:14px}
+    h1{font-size:28px;font-weight:300;margin-bottom:4px}
+    .sub{font-size:12px;color:#9a8880;margin-bottom:28px}
+    .ing{margin-bottom:24px;border:1px solid #e8ddd5;border-radius:8px;overflow:hidden}
+    .ing-hdr{background:#f7f0e8;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+    .ing-name{font-size:16px;font-weight:500;text-transform:capitalize}
+    .badge{font-size:11px;padding:2px 10px;border-radius:10px}
+    .up{background:#fce8ed;color:#d4506a}.dn{background:#e0f2ec;color:#5a9e82}.eq{background:#f0eae4;color:#9a8880}
+    .row{display:flex;gap:12px;padding:9px 16px;border-bottom:1px solid #f0eae4;font-size:13px}
+    .row:last-child{border:none}
+    .fecha{color:#9a8880;min-width:90px}
+    .precio{font-family:'Courier New',monospace;font-weight:600;min-width:80px}
+    .receta{color:#9a8880;flex:1;font-size:12px}
+    .diff{font-size:11px;min-width:80px;text-align:right}
+    @media print{body{margin:20px}}
+  </style></head><body>
+  <h1>📈 Historial de precios</h1>
+  <div class="sub">Pandivina · ${new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+  ${ingList.length === 0
+    ? '<p style="color:#9a8880;text-align:center;padding:40px">Sin cambios de precio registrados todavía.<br>Los cambios se registran automáticamente al guardar.</p>'
+    : ingList.map(ing => {
+        const arrow = ing.diff > 0.001 ? '▲' : ing.diff < -0.001 ? '▼' : '→';
+        const cls   = ing.diff > 0.001 ? 'up' : ing.diff < -0.001 ? 'dn' : 'eq';
+        return `<div class="ing">
+          <div class="ing-hdr">
+            <div class="ing-name">${ing.name}</div>
+            <div>
+              <span class="badge ${cls}">${arrow} ${Math.abs(ing.pct).toFixed(1)}% último cambio</span>
+              <span style="font-family:monospace;font-size:13px;margin-left:10px">${fmt3(ing.last.precio)} €/ud</span>
+            </div>
+          </div>
+          ${ing.hist.slice().reverse().slice(0,10).map((h,i,arr) => {
+            const prevH = arr[i+1];
+            const d = prevH ? h.precio - prevH.precio : 0;
+            const dStr = d !== 0 ? (d>0?'+':'')+fmt3(d)+' €' : '';
+            const dColor = d>0?'#d4506a':d<0?'#5a9e82':'#9a8880';
+            return `<div class="row">
+              <span class="fecha">${h.fecha}</span>
+              <span class="precio">${fmt3(h.precio)} €</span>
+              <span class="receta">${h.receta||''}</span>
+              <span class="diff" style="color:${dColor}">${dStr}</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+      }).join('')
+  }
+  <button onclick="window.print()" style="margin-top:20px;padding:10px 24px;background:#2a2420;color:white;border:none;border-radius:6px;cursor:pointer;font-size:13px">🖨️ Imprimir</button>
+  </body></html>`);
+  win.document.close();
+}
+
+
+// ══ GRÁFICO EVOLUCIÓN PRECIOS FLORES ════════════════════════
+function verGraficoFlores(){
+  const card = el('flGraficoCard');
+  if(card.style.display==='block'){ card.style.display='none'; return; }
+
+  // Get selected varieties (filtered ones or all if no filter)
+  const q = (el('flSearch')?.value||'').toLowerCase();
+  let vars = floresData.vars;
+  if(flF!=='todas') vars = vars.filter(f=>f.tipo===flF);
+  if(q) vars = vars.filter(f=>f.n.toLowerCase().includes(q));
+
+  if(!vars.length){ toast('No hay variedades para mostrar'); return; }
+
+  setEl('flGraficoTitle', flF==='todas' ? 'Todas las variedades' : flF);
+
+  // Get all weeks sorted
+  const semanas = floresData.semanas.slice().sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+  if(semanas.length < 2){ toast('Necesitas al menos 2 semanas de datos para el gráfico'); return; }
+
+  const labels = semanas.map(s=>{
+    const d = new Date(s.fecha);
+    return d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'});
+  });
+
+  // Colors for each variety
+  const COLORS = [
+    '#d4847a','#7ec8d4','#8aab8a','#e09060','#6a9ec8',
+    '#b060b0','#c8a840','#c05050','#508050','#4080a0'
+  ];
+
+  // Build datasets
+  const datasets = vars.slice(0,8).map((f,i) => {
+    const data = semanas.map(s => {
+      const p = f.precios?.find(pr=>pr.sid===s.id);
+      if(!p?.pm || !f.tpm) return null;
+      return parseFloat(p.pm) / parseFloat(f.tpm);
+    });
+    return { name: f.n, data, color: COLORS[i % COLORS.length] };
+  });
+
+  card.style.display = 'block';
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  // Draw chart on canvas
+  setTimeout(() => drawLineChart('flGraficoCanvas', labels, datasets, '€/tallo'), 50);
+
+  // Legend
+  el('flGraficoLegend').innerHTML = datasets.map(d=>
+    `<div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div style="width:20px;height:3px;border-radius:2px;background:${d.color}"></div>
+      <span>${d.name}</span>
+    </div>`
+  ).join('');
+}
+
+function drawLineChart(canvasId, labels, datasets, yLabel){
+  const canvas = el(canvasId);
+  if(!canvas) return;
+
+  // Set canvas size
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width - 36;
+  const H = 220;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Dimensions
+  const padL=52, padR=20, padT=20, padB=40;
+  const cW = W - padL - padR;
+  const cH = H - padT - padB;
+
+  // Find min/max across all datasets
+  const allVals = datasets.flatMap(d=>d.data.filter(v=>v!==null));
+  if(!allVals.length) return;
+  const minV = Math.min(...allVals) * 0.9;
+  const maxV = Math.max(...allVals) * 1.1;
+  const range = maxV - minV || 1;
+
+  // Get computed CSS colors
+  const style = getComputedStyle(document.documentElement);
+  const colBd  = style.getPropertyValue('--bd').trim()  || '#e8ddd5';
+  const colTx  = style.getPropertyValue('--tx').trim()  || '#2a2420';
+  const colTxd = style.getPropertyValue('--txd').trim() || '#9a8880';
+  const colSf  = style.getPropertyValue('--sf').trim()  || '#ffffff';
+
+  // Background
+  ctx.fillStyle = colSf;
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = colBd;
+  ctx.lineWidth = 1;
+  const gridLines = 5;
+  for(let i=0; i<=gridLines; i++){
+    const y = padT + cH - (i/gridLines)*cH;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL+cW, y); ctx.stroke();
+    // Y labels
+    const val = minV + (i/gridLines)*range;
+    ctx.fillStyle = colTxd;
+    ctx.font = '10px Consolas, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(2), padL-6, y+3);
+  }
+
+  // X labels
+  ctx.textAlign = 'center';
+  ctx.fillStyle = colTxd;
+  ctx.font = '10px Consolas, monospace';
+  labels.forEach((lbl, i) => {
+    const x = padL + (i/(labels.length-1||1))*cW;
+    ctx.fillText(lbl, x, H-padB+16);
+    // Vertical grid
+    if(i>0 && i<labels.length-1){
+      ctx.strokeStyle = colBd + '80';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath(); ctx.moveTo(x,padT); ctx.lineTo(x,padT+cH); ctx.stroke();
+    }
+  });
+
+  // Y axis label
+  ctx.save();
+  ctx.translate(12, padT + cH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.textAlign = 'center';
+  ctx.fillStyle = colTxd;
+  ctx.font = '10px Consolas, monospace';
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  // Draw lines and dots
+  datasets.forEach(ds => {
+    const pts = ds.data.map((v,i) => {
+      if(v===null) return null;
+      return {
+        x: padL + (i/(labels.length-1||1))*cW,
+        y: padT + cH - ((v-minV)/range)*cH
+      };
+    });
+
+    // Line
+    ctx.strokeStyle = ds.color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    let started = false;
+    pts.forEach(p => {
+      if(!p){ started=false; return; }
+      if(!started){ ctx.moveTo(p.x,p.y); started=true; }
+      else ctx.lineTo(p.x,p.y);
+    });
+    ctx.stroke();
+
+    // Dots
+    pts.forEach((p,i) => {
+      if(!p) return;
+      ctx.fillStyle = ds.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = colSf;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+      ctx.fill();
+    });
+  });
+
+  // Axes
+  ctx.strokeStyle = colBd;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT); ctx.lineTo(padL, padT+cH); ctx.lineTo(padL+cW, padT+cH);
+  ctx.stroke();
+}
+
+
+// ══ PROVEEDORES ══════════════════════════════════════════════
+let provEditId = null;
+
+function renderProveedores(){
+  const div = el('provList');
+  if(!div) return;
+
+  if(!proveedores.length){
+    div.innerHTML = '<div style="padding:20px;text-align:center;color:var(--txd);font-size:13px">Sin proveedores registrados</div>';
+    return;
+  }
+
+  div.innerHTML = proveedores.map(p => {
+    // Get flower names for this provider
+    const floresNames = (p.flores||[])
+      .map(fid => floresData.vars.find(f=>f.id===fid)?.n || fid)
+      .filter(Boolean);
+
+    return `<div style="padding:14px 18px;border-bottom:1px solid var(--bd)">
+      <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;margin-bottom:4px">${p.nombre}</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+            ${p.tel?`<a href="tel:${p.tel}" style="font-size:12px;color:var(--bl);text-decoration:none">📞 ${p.tel}</a>`:''}
+            ${p.email?`<a href="mailto:${p.email}" style="font-size:12px;color:var(--ac);text-decoration:none">✉️ ${p.email}</a>`:''}
+            ${p.web?`<a href="${p.web.startsWith('http')?p.web:'https://'+p.web}" target="_blank" style="font-size:12px;color:var(--txd);text-decoration:none">🌐 ${p.web}</a>`:''}
+          </div>
+          ${p.dia?`<div style="font-size:11px;color:var(--txd)">📅 Pedido habitual: ${p.dia}</div>`:''}
+          ${p.notas?`<div style="font-size:12px;color:var(--txd);margin-top:4px;font-style:italic">${p.notas}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          ${floresNames.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:200px">
+            ${floresNames.map(n=>`<span style="font-size:10px;background:var(--gnd);color:var(--gn);padding:2px 8px;border-radius:10px">🌸 ${n}</span>`).join('')}
+          </div>`:'<span style="font-size:11px;color:var(--txd)">Sin flores asignadas</span>'}
+          <div style="display:flex;gap:6px;margin-top:4px">
+            ${p.tel?`<a href="https://wa.me/34${p.tel.replace(/\D/g,'')}" target="_blank" class="btn btn-gn" style="font-size:11px;text-decoration:none;padding:5px 10px">💬 WA</a>`:''}
+            <button class="btn btn-o" onclick="abrirProvModal('${p.id}')" style="font-size:11px">✏️</button>
+            <button class="btn btn-o" onclick="eliminarProv('${p.id}')" style="font-size:11px;color:var(--rd)">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function abrirProvModal(id){
+  provEditId = id;
+  const p = id ? proveedores.find(x=>x.id===id) : null;
+  setEl('provModalTitle', p ? 'Editar proveedor' : 'Nuevo proveedor');
+
+  el('provNombre').value = p?.nombre||'';
+  el('provTel').value    = p?.tel||'';
+  el('provEmail').value  = p?.email||'';
+  el('provWeb').value    = p?.web||'';
+  el('provDia').value    = p?.dia||'';
+  el('provNotas').value  = p?.notas||'';
+
+  // Build flower checkboxes
+  const fc = el('provFloresCheck');
+  if(fc){
+    fc.innerHTML = floresData.vars.map(f=>`
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;padding:4px 8px;background:var(--sf);border-radius:5px;border:1px solid var(--bd)">
+        <input type="checkbox" value="${f.id}" ${(p?.flores||[]).includes(f.id)?'checked':''} style="accent-color:var(--gn)">
+        ${f.n||'Sin nombre'}
+      </label>`).join('');
+  }
+
+  el('provOverlay').classList.add('on');
+  setTimeout(()=>el('provNombre').focus(), 100);
+}
+
+function guardarProv(){
+  const nombre = el('provNombre').value.trim();
+  if(!nombre){ toast('El nombre del proveedor es obligatorio'); return; }
+
+  const flores = Array.from(el('provFloresCheck').querySelectorAll('input:checked')).map(i=>i.value);
+
+  const prov = {
+    id: provEditId || 'prov'+Date.now(),
+    nombre,
+    tel:   el('provTel').value.trim(),
+    email: el('provEmail').value.trim(),
+    web:   el('provWeb').value.trim(),
+    dia:   el('provDia').value,
+    notas: el('provNotas').value.trim(),
+    flores
+  };
+
+  if(provEditId){
+    const idx = proveedores.findIndex(p=>p.id===provEditId);
+    if(idx>=0) proveedores[idx] = prov;
+  } else {
+    proveedores.push(prov);
+  }
+
+  localStorage.setItem('pd_proveedores', JSON.stringify(proveedores));
+  cerrarProv();
+  renderProveedores();
+  toast(provEditId ? 'Proveedor actualizado ✓' : 'Proveedor añadido ✓');
+}
+
+function cerrarProv(){
+  el('provOverlay').classList.remove('on');
+  provEditId = null;
+}
+
+function eliminarProv(id){
+  const p = proveedores.find(x=>x.id===id);
+  if(!confirm('¿Eliminar proveedor "' + (p?.nombre||'') + '"?')) return;
+  proveedores = proveedores.filter(x=>x.id!==id);
+  localStorage.setItem('pd_proveedores', JSON.stringify(proveedores));
+  renderProveedores();
+  toast('Proveedor eliminado');
+}
+
+
+// ══ INVENTARIO POR CATEGORÍA ════════════════════════════════
+function renderInvCatBreakdown(){
+  const div = el('invCatBreakdown');
+  if(!div) return;
+
+  const CATS = {
+    perecedero: {label:'Perecedero', color:'var(--rd)',   icon:'🥬'},
+    seco:       {label:'Seco',       color:'var(--or)',   icon:'🌾'},
+    liquido:    {label:'Líquido',    color:'var(--bl)',   icon:'💧'},
+    packaging:  {label:'Packaging',  color:'var(--ac)',   icon:'📦'},
+    otro:       {label:'Otro',       color:'var(--txd)',  icon:'📁'},
+  };
+
+  const totals = {};
+  let grand = 0;
+  inv.forEach(it => {
+    const val = (parseFloat(it.stock)||0) * (parseFloat(it.c)||0);
+    const cat = it.cat || 'otro';
+    totals[cat] = (totals[cat]||0) + val;
+    grand += val;
+  });
+
+  if(!grand){
+    div.innerHTML = '<div style="color:var(--txd);font-size:13px;text-align:center;padding:16px">Sin datos de valor en el inventario</div>';
+    return;
+  }
+
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+
+  div.innerHTML = Object.entries(CATS).map(([key, cat]) => {
+    const val = totals[key] || 0;
+    const pct = grand > 0 ? (val/grand*100) : 0;
+    if(val === 0) return '';
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:16px">${cat.icon}</span>
+          <span style="font-size:13px;font-weight:500">${cat.label}</span>
+          <span style="font-size:11px;color:var(--txd)">(${inv.filter(i=>(i.cat||'otro')===key).length} productos)</span>
+        </div>
+        <div style="text-align:right">
+          <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:${cat.color}">${fmt2(val)}</span>
+          <span style="font-size:11px;color:var(--txd);margin-left:6px">${pct.toFixed(1)}%</span>
+        </div>
+      </div>
+      <div style="height:7px;background:var(--sf2);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct.toFixed(1)}%;background:${cat.color};border-radius:4px;transition:width .4s cubic-bezier(.34,1.56,.64,1)"></div>
+      </div>
+    </div>`;
+  }).join('') + `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--bd);margin-top:4px">
+      <span style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--txd)">Total inventario</span>
+      <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:var(--ack)">${fmt2(grand)}</span>
+    </div>`;
+}
+
+
+// ══ CLIENTES ════════════════════════════════════════════════
+function daysUntilNextOccurrence(dateStr){
+  if(!dateStr) return null;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const d = new Date(dateStr);
+  // Use current year
+  let next = new Date(now.getFullYear(), d.getMonth(), d.getDate());
+  if(next < now) next = new Date(now.getFullYear()+1, d.getMonth(), d.getDate());
+  return Math.round((next-now)/86400000);
+}
+
+function renderProximasFechas(){
+  const div = el('proximasFechas');
+  if(!div) return;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const upcoming = [];
+
+  clientes.forEach(c => {
+    const checks = [
+      {label:'Cumpleaños 🎂', date: c.cumple},
+      {label:'Aniversario 💕', date: c.aniversario},
+      ...(c.fechasExtra||[]).map(f=>({label:f.label||'Fecha especial ⭐', date:f.date}))
+    ];
+    checks.forEach(({label, date}) => {
+      const days = daysUntilNextOccurrence(date);
+      if(days !== null && days <= 30){
+        const d = new Date(date);
+        upcoming.push({
+          cliente: c.nombre, tel: c.tel, label, days,
+          dateStr: new Date(hoy.getFullYear(), d.getMonth(), d.getDate())
+            .toLocaleDateString('es-ES',{day:'2-digit',month:'long'}),
+          prefs: c.prefs, presupuesto: c.presupuesto, id: c.id
+        });
+      }
+    });
+  });
+
+  upcoming.sort((a,b)=>a.days-b.days);
+
+  if(!upcoming.length){
+    div.innerHTML='<div style="padding:16px 18px;color:var(--txd);font-size:13px;text-align:center">Sin fechas especiales en los próximos 30 días 🎉</div>';
+    return;
+  }
+
+  div.innerHTML = upcoming.map(u => {
+    const urgColor = u.days===0?'var(--rd)':u.days<=3?'var(--or)':u.days<=7?'var(--ac)':'var(--gn)';
+    const wa = u.tel ? `https://wa.me/34${u.tel.replace(/\D/g,'')}?text=${encodeURIComponent('Hola '+u.cliente+'! 🌸 '+u.label+' se acerca, ¿te preparamos algo especial?')}` : null;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bd);flex-wrap:wrap">
+      <div style="min-width:52px;text-align:center">
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;color:${urgColor};font-weight:600">${u.days===0?'HOY':u.days+'d'}</div>
+        <div style="font-size:10px;color:var(--txd)">${u.dateStr}</div>
+      </div>
+      <div style="flex:1;min-width:150px">
+        <div style="font-size:14px;font-weight:500">${u.cliente}</div>
+        <div style="font-size:12px;color:var(--txd)">${u.label}</div>
+        ${u.prefs?`<div style="font-size:11px;color:var(--ac);margin-top:2px">🌸 ${u.prefs}</div>`:''}
+      </div>
+      ${u.presupuesto?`<div style="text-align:right"><div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;color:var(--ack)">${parseFloat(u.presupuesto).toLocaleString('es-ES',{minimumFractionDigits:0})} €</div><div style="font-size:10px;color:var(--txd)">presupuesto</div></div>`:''}
+      <div style="display:flex;gap:6px">
+        ${wa?`<a href="${wa}" target="_blank" class="btn btn-gn" style="font-size:11px;text-decoration:none">💬 WA</a>`:''}
+        <button class="btn btn-p" onclick="abrirPedidoDesdeCliente('${u.id}')" style="font-size:11px">+ Pedido</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderClientes(){
+  const q = (el('clientesSearch')?.value||'').toLowerCase();
+  let items = clientes;
+  if(q) items = items.filter(c=>(c.nombre||'').toLowerCase().includes(q)||(c.tel||'').includes(q));
+
+  const sum = el('clientesSummary');
+  if(sum){
+    const conCumple = clientes.filter(c=>c.cumple).length;
+    const proximos = clientes.filter(c=>{
+      const days = daysUntilNextOccurrence(c.cumple);
+      return days!==null && days<=30;
+    }).length;
+    sum.innerHTML = `
+      <div class="stat-cell"><span class="sv" style="color:var(--ack)">${clientes.length}</span><span class="sl">Clientes</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--gn)">${conCumple}</span><span class="sl">Con cumpleaños</span></div>
+      <div class="stat-cell"><span class="sv" style="color:var(--or)">${proximos}</span><span class="sl">Fechas próximas</span></div>
+      <div class="stat-cell"><span class="sv">${pedidos.filter(p=>clientes.find(c=>c.nombre===p.cliente)).length}</span><span class="sl">Pedidos registrados</span></div>`;
+  }
+
+  const list = el('clientesList');
+  if(!list) return;
+  if(!items.length){
+    list.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--txd);font-size:14px">
+      ${clientes.length===0?'No hay clientes todavía.<br><br><button class="btn btn-p" onclick="abrirClienteModal(null)">+ Añadir primer cliente</button>':'Sin resultados'}
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(c => {
+    const pedidosCliente = pedidos.filter(p=>p.cliente===c.nombre);
+    const totalGastado = pedidosCliente.reduce((s,p)=>s+(parseFloat(p.importe)||0),0);
+    const diasCumple = daysUntilNextOccurrence(c.cumple);
+    return `<div class="card" style="margin-bottom:10px">
+      <div style="padding:14px 18px">
+        <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;margin-bottom:6px">${c.nombre}
+              ${diasCumple!==null&&diasCumple<=7?`<span style="font-size:11px;background:var(--ord);color:var(--or);padding:2px 8px;border-radius:10px;margin-left:6px">🎂 ${diasCumple===0?'¡Hoy!':'En '+diasCumple+'d'}</span>`:''}
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+              ${c.tel?`<a href="tel:${c.tel}" style="font-size:12px;color:var(--bl);text-decoration:none">📞 ${c.tel}</a>`:''}
+              ${c.email?`<a href="mailto:${c.email}" style="font-size:12px;color:var(--ac);text-decoration:none">✉️ ${c.email}</a>`:''}
+            </div>
+            ${c.prefs?`<div style="font-size:12px;color:var(--ac)">🌸 ${c.prefs}</div>`:''}
+            ${c.notas?`<div style="font-size:12px;color:var(--txd);margin-top:3px;font-style:italic">${c.notas}</div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${totalGastado>0?`<div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:var(--ack)">${totalGastado.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} €</div><div style="font-size:10px;color:var(--txd)">${pedidosCliente.length} pedido${pedidosCliente.length!==1?'s':''}</div>`:'<div style="font-size:11px;color:var(--txd)">Sin pedidos</div>'}
+            ${c.presupuesto?`<div style="font-size:11px;color:var(--txd)">Presupuesto: ${parseFloat(c.presupuesto).toLocaleString('es-ES',{minimumFractionDigits:0})} €</div>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);flex-wrap:wrap">
+          <button class="btn btn-o" onclick="abrirClienteModal('${c.id}')" style="font-size:12px">✏️ Editar</button>
+          <button class="btn btn-p" onclick="abrirPedidoDesdeCliente('${c.id}')" style="font-size:12px">+ Nuevo pedido</button>
+          ${c.tel?`<a href="https://wa.me/34${c.tel.replace(/\D/g,'')}" target="_blank" class="btn btn-gn" style="font-size:12px;text-decoration:none">💬 WA</a>`:''}
+          <button class="btn btn-o" onclick="eliminarCliente('${c.id}')" style="font-size:12px;color:var(--rd);margin-left:auto">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderProximasFechas();
+}
+
+function addFechaExtra(){
+  fechasExtra.push({label:'', date:''});
+  renderFechasExtra();
+}
+
+function renderFechasExtra(){
+  const div = el('cliFechasExtra');
+  if(!div) return;
+  div.innerHTML = fechasExtra.map((f,i)=>`
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" class="fib" placeholder="Ej: Día de su boda" value="${f.label}"
+        oninput="fechasExtra[${i}].label=this.value" style="flex:1">
+      <input type="date" class="fib" value="${f.date}"
+        oninput="fechasExtra[${i}].date=this.value" style="width:150px">
+      <button class="btn-x" onclick="fechasExtra.splice(${i},1);renderFechasExtra()">×</button>
+    </div>`).join('');
+}
+
+function abrirClienteModal(id){
+  clienteEditId = id;
+  const c = id ? clientes.find(x=>x.id===id) : null;
+  setEl('clienteModalTitle', c ? 'Editar cliente' : 'Nuevo cliente');
+  el('cliNombre').value      = c?.nombre||'';
+  el('cliTel').value         = c?.tel||'';
+  el('cliEmail').value       = c?.email||'';
+  el('cliCumple').value      = c?.cumple||'';
+  el('cliAniversario').value = c?.aniversario||'';
+  el('cliPrefs').value       = c?.prefs||'';
+  el('cliPresupuesto').value = c?.presupuesto||'';
+  el('cliNotas').value       = c?.notas||'';
+  fechasExtra = JSON.parse(JSON.stringify(c?.fechasExtra||[]));
+  renderFechasExtra();
+  el('clienteOverlay').classList.add('on');
+  setTimeout(()=>el('cliNombre').focus(), 100);
+}
+
+function guardarCliente(){
+  const nombre = el('cliNombre').value.trim();
+  if(!nombre){ toast('El nombre es obligatorio'); return; }
+  const cli = {
+    id: clienteEditId || 'cli'+Date.now(),
+    nombre,
+    tel:          el('cliTel').value.trim(),
+    email:        el('cliEmail').value.trim(),
+    cumple:       el('cliCumple').value,
+    aniversario:  el('cliAniversario').value,
+    prefs:        el('cliPrefs').value.trim(),
+    presupuesto:  el('cliPresupuesto').value,
+    notas:        el('cliNotas').value.trim(),
+    fechasExtra:  fechasExtra.filter(f=>f.date)
+  };
+  if(clienteEditId){
+    const idx = clientes.findIndex(c=>c.id===clienteEditId);
+    if(idx>=0) clientes[idx]=cli;
+  } else {
+    clientes.push(cli);
+  }
+  localStorage.setItem('pd_clientes', JSON.stringify(clientes));
+  cerrarCliente();
+  renderClientes();
+  toast(clienteEditId?'Cliente actualizado ✓':'Cliente añadido ✓');
+}
+
+function cerrarCliente(){
+  el('clienteOverlay').classList.remove('on');
+  clienteEditId = null;
+}
+
+function eliminarCliente(id){
+  const c = clientes.find(x=>x.id===id);
+  if(!confirm('¿Eliminar cliente "' + (c?.nombre||'') + '"?')) return;
+  clientes = clientes.filter(x=>x.id!==id);
+  localStorage.setItem('pd_clientes', JSON.stringify(clientes));
+  renderClientes();
+  toast('Cliente eliminado');
+}
+
+function abrirPedidoDesdeCliente(clienteId){
+  const c = clientes.find(x=>x.id===clienteId);
+  if(!c) return;
+  // Switch to pedidos tab and pre-fill
+  goTab('pedidos', document.querySelector('[data-tab="pedidos"]'));
+  setTimeout(()=>{
+    abrirNuevoPedido();
+    el('pedCliente').value = c.nombre;
+    el('pedTelefono').value = c.tel||'';
+    el('pedImporte').value = c.presupuesto||'';
+  }, 100);
+}
+
 // ── WIRE UP STATIC HTML EVENT LISTENERS ─────────────────
 document.querySelectorAll('[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => goTab(btn.dataset.tab, btn));
 });
 document.querySelector('[data-action="new-dish"]')?.addEventListener('click', newDish);
 document.querySelector('[data-action="new-dish-drawer"]')?.addEventListener('click', newDish);
+// Wire dishSel inside drawer
+el('dishSel')?.addEventListener('change', function(){ loadDish(this.value); });
 document.querySelector('[data-action="close-drawer"]')?.addEventListener('click', closeEscDrawer);
 document.querySelector('[data-action="del-dish"]')?.addEventListener('click', delDish);
 document.querySelector('[data-action="sync"]')?.addEventListener('click', syncToSupabase);
@@ -1707,6 +3540,7 @@ document.getElementById('btnSuConnect')?.addEventListener('click', connectSumUp)
 document.querySelectorAll('[data-action="close-drawer"]').forEach(el=>el.addEventListener('click', closeEscDrawer));
 document.querySelector('[data-action="save-close"]')?.addEventListener('click', ()=>{saveAll();closeEscDrawer();renderRecetas();});
 document.querySelector('[data-action="cancel-drawer"]')?.addEventListener('click', ()=>{closeEscDrawer();renderRecetas();});
+el('btnDashRefresh')?.addEventListener('click', loadDashboard);
 // Ventas
 el('btnFetchVentas')?.addEventListener('click', fetchVentas);
 el('btnExportVentas')?.addEventListener('click', exportVentasCSV);
