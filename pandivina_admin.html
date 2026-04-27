@@ -503,6 +503,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   <button class="tab" data-tab="compra">🛒 Compra</button>
   <button class="tab" data-tab="productos">🛒 Tienda</button>
   <button class="tab" data-tab="ventas">📊 Ventas</button>
+  <button class="tab" data-tab="finanzas">💰 Finanzas</button>
   <button class="tab" data-tab="res">Resumen</button>
   <button class="tab" data-tab="gastos">Gastos Fijos</button>
   <button class="tab" data-tab="ajustes">⚙ Ajustes</button>
@@ -991,6 +992,96 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   </div>
 </div>
 
+
+<!-- ══ FINANZAS ══════════════════════════════════════════════ -->
+<div class="panel" id="panel-finanzas">
+
+  <!-- Month selector + objective -->
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-style:italic">💰 Gestión Financiera</div>
+    <input type="month" class="fib" id="finMes" style="width:160px" onchange="finanzasMes=this.value;renderFinanzas()">
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+      <span style="font-size:12px;color:var(--txd)">Objetivo mensual</span>
+      <input type="number" class="fib" id="finObjetivo" value="6000" step="100" min="0"
+        style="width:110px" oninput="renderFinanzasSummary()">
+      <span style="font-size:12px;color:var(--txd)">€</span>
+    </div>
+  </div>
+
+  <!-- KPI summary -->
+  <div class="stat-grid" id="finSummary" style="margin-bottom:18px"></div>
+
+  <!-- Objetivo diario tracker -->
+  <div class="card" style="margin-bottom:14px" id="finObjetivoCard">
+    <div class="card-hdr">🎯 Seguimiento del objetivo mensual</div>
+    <div style="padding:18px" id="finObjetivoBody"></div>
+  </div>
+
+  <!-- Grid: Ventas + Gastos fijos side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- VENTAS DIARIAS -->
+    <div class="card">
+      <div class="card-hdr">
+        <span>📈 Ventas diarias</span>
+        <span id="finVentasTotal" style="color:var(--ack);font-family:'Cormorant Garamond',Georgia,serif;font-size:16px"></span>
+      </div>
+      <div style="overflow-y:auto;max-height:480px">
+        <div class="th-row" style="grid-template-columns:38px 1fr 1fr 1fr 1fr 60px;font-size:10px;padding:6px 12px">
+          <span class="cl">Día</span><span class="cl" style="text-align:right">Efectivo</span>
+          <span class="cl" style="text-align:right">SumUp</span><span class="cl" style="text-align:right">Online</span>
+          <span class="cl" style="text-align:right">Bizum</span><span class="cl" style="text-align:right">Total</span>
+        </div>
+        <div id="finVentasList"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:16px;padding:10px 18px;border-top:1px solid var(--bd);flex-wrap:wrap">
+        <div><span style="font-size:10px;color:var(--or)">💵 Efectivo: </span><span id="finTotEf" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:var(--or)">0 €</span></div>
+        <div><span style="font-size:10px;color:var(--bl)">💳 SumUp: </span><span id="finTotSu" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:var(--bl)">0 €</span></div>
+        <div><span style="font-size:10px;color:var(--ac)">🌐 Online: </span><span id="finTotOn" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:var(--ac)">0 €</span></div>
+        <div><span style="font-size:10px;color:var(--gn)">📱 Bizum: </span><span id="finTotBiz" style="font-family:'Cormorant Garamond',Georgia,serif;font-size:16px;color:var(--gn)">0 €</span></div>
+      </div>
+    </div>
+
+    <!-- GASTOS FIJOS -->
+    <div class="card">
+      <div class="card-hdr">
+        <span>🔒 Gastos fijos del mes</span>
+        <span id="finGasFijTotal" style="color:var(--rd);font-family:'Cormorant Garamond',Georgia,serif;font-size:16px"></span>
+      </div>
+      <div style="overflow-y:auto;max-height:480px;padding:0 4px" id="finGasFijList"></div>
+      <div style="padding:0 14px 12px">
+        <button class="add-row" onclick="addGastoFijo()" style="border-color:rgba(212,80,106,.3);color:var(--rd)">
+          <span style="font-size:15px">+</span> Añadir gasto fijo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GASTOS VARIABLES -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-hdr">
+      <span>📦 Gastos variables del mes</span>
+      <span id="finGasVarTotal" style="color:var(--or);font-family:'Cormorant Garamond',Georgia,serif;font-size:16px"></span>
+    </div>
+    <div style="overflow-x:auto;padding-bottom:4px">
+      <div class="th-row" style="grid-template-columns:1.5fr 1.5fr 1.5fr 1fr 40px;min-width:580px;padding:6px 14px">
+        <span class="cl">Categoría</span><span class="cl">Proveedor</span>
+        <span class="cl">Albarán/Factura</span><span class="cl" style="text-align:right">Importe</span><span></span>
+      </div>
+      <div id="finGasVarList" style="min-width:580px"></div>
+    </div>
+    <div style="padding:0 14px 12px">
+      <button class="add-row" onclick="addGastoVar()"><span style="font-size:15px">+</span> Añadir gasto variable</button>
+    </div>
+  </div>
+
+  <!-- RESUMEN MENSUAL -->
+  <div class="card">
+    <div class="card-hdr">📊 Resumen del mes</div>
+    <div style="padding:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px" id="finResumenMes"></div>
+  </div>
+
+</div>
 </main>
 </div><!-- /appScreen -->
 
@@ -1085,6 +1176,10 @@ let proveedores = JSON.parse(localStorage.getItem('pd_proveedores')||'null') || 
 let clientes = JSON.parse(localStorage.getItem('pd_clientes')||'null') || [];
 let clienteEditId = null;
 let fechasExtra = [];
+let finanzasData = JSON.parse(localStorage.getItem('pd_finanzas')||'null') || {};
+// finanzasData = { "2026-01": { ventas:[{dia,ef,su,on,biz}], gastosFijos:{local:1000,...}, gastosVar:[{cat,prov,ref,imp}] } }
+let finanzasMes = new Date().toISOString().slice(0,7); // "2026-04"
+
 // proveedores = [{id, nombre, tel, email, notas, flores:[florId,...]}]
 // preciosHist = { "NombreIngrediente": [{fecha, precio, receta}] }
 let pedidoEditId = null;
@@ -1135,6 +1230,7 @@ function goTab(id,btn){
   if(id==='gastos')renderFixed();
   if(id==='inv'){renderInv();renderInvSum();renderInvCatBreakdown();}
   if(id==='inicio')loadDashboard();
+  if(id==='finanzas'){finanzasMes=new Date().toISOString().slice(0,7);renderFinanzas();}
   if(id==='pedidos')renderPedidos();
   if(id==='compra')renderCompra();
   if(id==='clientes')renderClientes();
@@ -3580,6 +3676,278 @@ function abrirPedidoDesdeCliente(clienteId){
     el('pedTelefono').value = c.tel||'';
     el('pedImporte').value = c.presupuesto||'';
   }, 100);
+}
+
+
+// ══ FINANZAS ════════════════════════════════════════════════
+const GASTOS_FIJOS_DEFAULT = [
+  {n:'Local',          v:1000,   fijo:true},
+  {n:'Electricidad',   v:0,      fijo:true},
+  {n:'Agua',           v:0,      fijo:true},
+  {n:'Asesoría',       v:0,      fijo:true},
+  {n:'Autónomo',       v:231.63, fijo:true},
+  {n:'Sueldo',         v:0,      fijo:false},
+  {n:'Impuestos',      v:0,      fijo:false},
+  {n:'Pago fraccionado',v:0,     fijo:false},
+  {n:'Seguros',        v:0,      fijo:false},
+  {n:'Tienda',         v:0,      fijo:false},
+  {n:'Publicidad Google',v:0,    fijo:false},
+  {n:'Publicidad FB/Insta',v:0,  fijo:false},
+  {n:'Puerto',         v:53,     fijo:true},
+  {n:'Préstamos',      v:0,      fijo:false},
+  {n:'Internet Digi',  v:29,     fijo:true},
+  {n:'Comisiones SumUp',v:0,     fijo:false},
+  {n:'Varios',         v:0,      fijo:false},
+];
+
+const GASTOS_VAR_CATS = ['Proveedores flores/plantas','Reparaciones/Reformas','Amazon/Temu/Aliexpress','Otros proveedores','Varios'];
+
+function getMesData(){
+  if(!finanzasData[finanzasMes]){
+    // Init with defaults
+    const dias = new Date(finanzasMes.slice(0,4), parseInt(finanzasMes.slice(5,7)), 0).getDate();
+    finanzasData[finanzasMes] = {
+      ventas: Array.from({length:dias},(_,i)=>({dia:i+1,ef:0,su:0,on:0,biz:0})),
+      gasFijos: JSON.parse(JSON.stringify(GASTOS_FIJOS_DEFAULT)),
+      gasVar: []
+    };
+  }
+  return finanzasData[finanzasMes];
+}
+
+function saveFinanzas(){
+  localStorage.setItem('pd_finanzas', JSON.stringify(finanzasData));
+}
+
+function renderFinanzas(){
+  const inp = el('finMes');
+  if(inp && !inp.value) inp.value = finanzasMes;
+  renderFinanzasVentas();
+  renderFinanzasGasFijos();
+  renderFinanzasGasVar();
+  renderFinanzasSummary();
+}
+
+function renderFinanzasVentas(){
+  const d = getMesData();
+  const fmt2 = n => n ? n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+  const hoy = new Date().getDate();
+  const mesActual = new Date().toISOString().slice(0,7) === finanzasMes;
+
+  let totEf=0,totSu=0,totOn=0,totBiz=0;
+  d.ventas.forEach(v=>{ totEf+=v.ef||0; totSu+=v.su||0; totOn+=v.on||0; totBiz+=v.biz||0; });
+  const totTotal = totEf+totSu+totOn+totBiz;
+
+  setEl('finVentasTotal', totTotal.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+  setEl('finTotEf',  fmt2(totEf)+' €');
+  setEl('finTotSu',  fmt2(totSu)+' €');
+  setEl('finTotOn',  fmt2(totOn)+' €');
+  setEl('finTotBiz', fmt2(totBiz)+' €');
+
+  el('finVentasList').innerHTML = d.ventas.map((v,i) => {
+    const total = (v.ef||0)+(v.su||0)+(v.on||0)+(v.biz||0);
+    const isHoy = mesActual && v.dia === hoy;
+    const rowBg = isHoy ? 'background:var(--acd)' : total>0 ? '' : 'opacity:.5';
+    return `<div class="tr-row" style="grid-template-columns:38px 1fr 1fr 1fr 1fr 60px;${rowBg}">
+      <span style="font-size:12px;color:${isHoy?'var(--ack)':'var(--txd)'};font-weight:${isHoy?700:400}">${v.dia}</span>
+      <input class="fi r" type="number" value="${v.ef||''}" placeholder="0" step="0.01" min="0"
+        oninput="getMesData().ventas[${i}].ef=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();updateVentaRow(${i})" style="font-size:12px">
+      <input class="fi r" type="number" value="${v.su||''}" placeholder="0" step="0.01" min="0"
+        oninput="getMesData().ventas[${i}].su=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();updateVentaRow(${i})" style="font-size:12px">
+      <input class="fi r" type="number" value="${v.on||''}" placeholder="0" step="0.01" min="0"
+        oninput="getMesData().ventas[${i}].on=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();updateVentaRow(${i})" style="font-size:12px">
+      <input class="fi r" type="number" value="${v.biz||''}" placeholder="0" step="0.01" min="0"
+        oninput="getMesData().ventas[${i}].biz=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();updateVentaRow(${i})" style="font-size:12px">
+      <span style="font-size:12px;text-align:right;color:${total>0?'var(--ack)':'var(--txd)'};font-weight:${total>0?600:400}" id="finVRow${i}">${total>0?total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateVentaRow(i){
+  const v = getMesData().ventas[i];
+  const total = (v.ef||0)+(v.su||0)+(v.on||0)+(v.biz||0);
+  const el2 = el('finVRow'+i);
+  if(el2){
+    el2.textContent = total>0?total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
+    el2.style.color = total>0?'var(--ack)':'var(--txd)';
+    el2.style.fontWeight = total>0?'600':'400';
+  }
+  // Update totals
+  let totEf=0,totSu=0,totOn=0,totBiz=0;
+  getMesData().ventas.forEach(v2=>{ totEf+=v2.ef||0; totSu+=v2.su||0; totOn+=v2.on||0; totBiz+=v2.biz||0; });
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+  const tot = totEf+totSu+totOn+totBiz;
+  setEl('finVentasTotal', tot.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+  setEl('finTotEf', fmt2(totEf)); setEl('finTotSu', fmt2(totSu));
+  setEl('finTotOn', fmt2(totOn)); setEl('finTotBiz', fmt2(totBiz));
+}
+
+function renderFinanzasGasFijos(){
+  const d = getMesData();
+  const fmt2 = n => n ? n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+  const total = d.gasFijos.reduce((s,g)=>s+(parseFloat(g.v)||0),0);
+  setEl('finGasFijTotal', total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+
+  el('finGasFijList').innerHTML = d.gasFijos.map((g,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 100px 36px;gap:6px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--bd)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:14px">${g.fijo?'🔒':'📌'}</span>
+        <input class="fi" type="text" value="${g.n}" placeholder="Concepto"
+          oninput="getMesData().gasFijos[${i}].n=this.value;saveFinanzas()"
+          style="font-size:13px">
+      </div>
+      <input class="fi r" type="number" value="${g.v||''}" placeholder="0,00" step="0.01" min="0"
+        oninput="getMesData().gasFijos[${i}].v=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();
+        setEl('finGasFijTotal',getMesData().gasFijos.reduce((s,x)=>s+(parseFloat(x.v)||0),0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €')"
+        style="font-size:13px">
+      <button class="btn-x" onclick="getMesData().gasFijos.splice(${i},1);saveFinanzas();renderFinanzasGasFijos();renderFinanzasSummary()">×</button>
+    </div>`).join('');
+}
+
+function addGastoFijo(){
+  getMesData().gasFijos.push({n:'',v:0,fijo:false});
+  saveFinanzas();
+  renderFinanzasGasFijos();
+}
+
+function renderFinanzasGasVar(){
+  const d = getMesData();
+  const fmt2 = n => n ? n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}) : '';
+  const total = d.gasVar.reduce((s,g)=>s+(parseFloat(g.imp)||0),0);
+  setEl('finGasVarTotal', total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €');
+
+  el('finGasVarList').innerHTML = d.gasVar.map((g,i)=>`
+    <div class="tr-row" style="grid-template-columns:1.5fr 1.5fr 1.5fr 1fr 40px">
+      <div style="position:relative">
+        <select class="fi" onchange="getMesData().gasVar[${i}].cat=this.value;saveFinanzas()" style="font-size:12px;appearance:none;padding-right:20px">
+          ${GASTOS_VAR_CATS.map(c=>`<option value="${c}" ${g.cat===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <input class="fi" type="text" value="${g.prov||''}" placeholder="Proveedor"
+        oninput="getMesData().gasVar[${i}].prov=this.value;saveFinanzas()" style="font-size:12px">
+      <input class="fi" type="text" value="${g.ref||''}" placeholder="Albarán/Factura"
+        oninput="getMesData().gasVar[${i}].ref=this.value;saveFinanzas()" style="font-size:12px">
+      <input class="fi r" type="number" value="${g.imp||''}" placeholder="0,00" step="0.01" min="0"
+        oninput="getMesData().gasVar[${i}].imp=parseFloat(this.value)||0;saveFinanzas();renderFinanzasSummary();
+        setEl('finGasVarTotal',getMesData().gasVar.reduce((s,x)=>s+(parseFloat(x.imp)||0),0).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €')"
+        style="font-size:12px">
+      <button class="btn-x" onclick="getMesData().gasVar.splice(${i},1);saveFinanzas();renderFinanzasGasVar();renderFinanzasSummary()">×</button>
+    </div>`).join('');
+}
+
+function addGastoVar(){
+  getMesData().gasVar.push({cat:'Proveedores flores/plantas',prov:'',ref:'',imp:0});
+  saveFinanzas();
+  renderFinanzasGasVar();
+}
+
+function renderFinanzasSummary(){
+  const d = getMesData();
+  const objetivo = parseFloat(el('finObjetivo')?.value)||6000;
+  const diasMes = d.ventas.length;
+  const hoy = new Date().getDate();
+  const mesActual = new Date().toISOString().slice(0,7)===finanzasMes;
+  const diasTranscurridos = mesActual ? hoy : diasMes;
+
+  const ingresoTotal = d.ventas.reduce((s,v)=>s+(v.ef||0)+(v.su||0)+(v.on||0)+(v.biz||0),0);
+  const gasFijTotal  = d.gasFijos.reduce((s,g)=>s+(parseFloat(g.v)||0),0);
+  const gasVarTotal  = d.gasVar.reduce((s,g)=>s+(parseFloat(g.imp)||0),0);
+  const gastoTotal   = gasFijTotal + gasVarTotal;
+  const beneficio    = ingresoTotal - gastoTotal;
+  const objetivoDia  = objetivo / diasMes;
+  const ingresoDia   = diasTranscurridos>0 ? ingresoTotal/diasTranscurridos : 0;
+  const faltaMes     = objetivo - ingresoTotal;
+  const diasRestantes= diasMes - diasTranscurridos;
+  const necesitaDia  = diasRestantes>0 ? faltaMes/diasRestantes : 0;
+  const pctObjetivo  = objetivo>0 ? (ingresoTotal/objetivo*100) : 0;
+  const fmt2 = n => n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+
+  // KPIs
+  const sum = el('finSummary');
+  if(sum){
+    sum.innerHTML = `
+      <div class="stat-cell"><span class="sl">Ingresos del mes</span><span class="sv" style="color:var(--ack)">${fmt2(ingresoTotal)}</span></div>
+      <div class="stat-cell"><span class="sl">Gastos fijos</span><span class="sv" style="color:var(--rd)">${fmt2(gasFijTotal)}</span></div>
+      <div class="stat-cell"><span class="sl">Gastos variables</span><span class="sv" style="color:var(--or)">${fmt2(gasVarTotal)}</span></div>
+      <div class="stat-cell"><span class="sl">Gasto total</span><span class="sv" style="color:var(--rd)">${fmt2(gastoTotal)}</span></div>
+      <div class="stat-cell"><span class="sl">Beneficio neto</span><span class="sv" style="color:${beneficio>=0?'var(--gn)':'var(--rd)'}">${fmt2(beneficio)}</span></div>
+      <div class="stat-cell"><span class="sl">Objetivo mes</span><span class="sv">${fmt2(objetivo)}</span></div>`;
+  }
+
+  // Objetivo tracker
+  const ob = el('finObjetivoBody');
+  if(ob){
+    const barPct = Math.min(100, pctObjetivo);
+    const barColor = pctObjetivo>=100?'var(--gn)':pctObjetivo>=70?'var(--ac)':pctObjetivo>=40?'var(--or)':'var(--rd)';
+    ob.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px">
+        <div style="background:var(--sf2);border-radius:8px;padding:14px">
+          <div class="sl">Objetivo diario necesario</div>
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;color:var(--ack)">${fmt2(objetivoDia)}</div>
+          <div style="font-size:11px;color:var(--txd)">${fmt2(objetivo)} ÷ ${diasMes} días</div>
+        </div>
+        <div style="background:var(--sf2);border-radius:8px;padding:14px">
+          <div class="sl">Media real por día</div>
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;color:${ingresoDia>=objetivoDia?'var(--gn)':'var(--rd)'}">${fmt2(ingresoDia)}</div>
+          <div style="font-size:11px;color:var(--txd)">${diasTranscurridos} días con datos</div>
+        </div>
+        <div style="background:var(--sf2);border-radius:8px;padding:14px">
+          <div class="sl">${faltaMes>0?'Falta para el objetivo':'¡Objetivo superado!'}</div>
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;color:${faltaMes>0?'var(--or)':'var(--gn)'}">${fmt2(Math.abs(faltaMes))}</div>
+          <div style="font-size:11px;color:var(--txd)">${diasRestantes>0?diasRestantes+' días restantes':'Mes completado'}</div>
+        </div>
+        <div style="background:var(--sf2);border-radius:8px;padding:14px">
+          <div class="sl">Necesitas por día (resto mes)</div>
+          <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;color:${necesitaDia<=objetivoDia?'var(--gn)':necesitaDia<=objetivoDia*1.5?'var(--or)':'var(--rd)'}">${diasRestantes>0?fmt2(necesitaDia):'—'}</div>
+          <div style="font-size:11px;color:var(--txd)">para llegar al objetivo</div>
+        </div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-row">
+          <span class="cl">Progreso hacia el objetivo</span>
+          <span style="font-size:13px;font-weight:600;color:${barColor}">${pctObjetivo.toFixed(1)}% — ${fmt2(ingresoTotal)} de ${fmt2(objetivo)}</span>
+        </div>
+        <div class="bar-track" style="height:14px">
+          <div class="bar-fill" style="width:${barPct}%;background:${barColor}"></div>
+        </div>
+        <div class="bar-z">
+          <span class="bz">0%</span>
+          <span class="bz">50% — ${fmt2(objetivo/2)}</span>
+          <span class="bz">100% — ${fmt2(objetivo)}</span>
+        </div>
+      </div>
+      ${ingresoDia>0?`<div style="margin-top:12px;padding:10px 14px;background:var(--sf2);border-radius:8px;font-size:13px;color:var(--txd)">
+        📊 Al ritmo actual de <strong style="color:var(--tx)">${fmt2(ingresoDia)}/día</strong>,
+        acabarás el mes con <strong style="color:${ingresoDia*diasMes>=objetivo?'var(--gn)':'var(--rd)'}">${fmt2(ingresoDia*diasMes)}</strong>
+        (${ingresoDia*diasMes>=objetivo?'✓ superarías el objetivo':'✗ no llegarías al objetivo'})
+      </div>`:''}`;
+  }
+
+  // Resumen mensual
+  const rm = el('finResumenMes');
+  if(rm){
+    rm.innerHTML = `
+      <div style="background:var(--sf2);border-radius:8px;padding:16px;border-left:3px solid var(--ack)">
+        <div class="sl">Ingreso real total</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:var(--ack)">${fmt2(ingresoTotal)}</div>
+        <div style="font-size:11px;color:var(--txd);margin-top:4px">Efectivo: ${fmt2(d.ventas.reduce((s,v)=>s+(v.ef||0),0))} · SumUp: ${fmt2(d.ventas.reduce((s,v)=>s+(v.su||0),0))} · Online: ${fmt2(d.ventas.reduce((s,v)=>s+(v.on||0),0))} · Bizum: ${fmt2(d.ventas.reduce((s,v)=>s+(v.biz||0),0))}</div>
+      </div>
+      <div style="background:var(--sf2);border-radius:8px;padding:16px;border-left:3px solid var(--rd)">
+        <div class="sl">Gasto real total</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:var(--rd)">${fmt2(gastoTotal)}</div>
+        <div style="font-size:11px;color:var(--txd);margin-top:4px">Fijos: ${fmt2(gasFijTotal)} · Variables: ${fmt2(gasVarTotal)}</div>
+      </div>
+      <div style="background:var(--sf2);border-radius:8px;padding:16px;border-left:3px solid ${beneficio>=0?'var(--gn)':'var(--rd)'}">
+        <div class="sl">Resultado del mes</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:${beneficio>=0?'var(--gn)':'var(--rd)'}">${fmt2(beneficio)}</div>
+        <div style="font-size:11px;color:var(--txd);margin-top:4px">${beneficio>=0?'✓ Mes positivo':'✗ Mes negativo — déficit de '+fmt2(Math.abs(beneficio))}</div>
+      </div>
+      <div style="background:var(--sf2);border-radius:8px;padding:16px;border-left:3px solid var(--bl)">
+        <div class="sl">Objetivo del mes</div>
+        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px">${fmt2(objetivo)}</div>
+        <div style="font-size:11px;color:var(--txd);margin-top:4px">${fmt2(objetivoDia)}/día · ${diasMes} días laborables</div>
+      </div>`;
+  }
 }
 
 // ── WIRE UP STATIC HTML EVENT LISTENERS ─────────────────
