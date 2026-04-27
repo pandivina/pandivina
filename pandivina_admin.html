@@ -1000,6 +1000,7 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap">
     <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;font-style:italic">💰 Gestión Financiera</div>
     <input type="month" class="fib" id="finMes" style="width:160px" onchange="finanzasMes=this.value;renderFinanzas()">
+    <button class="btn btn-gn" id="btnFinImport" style="font-size:12px">📥 Importar desde SumUp</button>
     <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
       <span style="font-size:12px;color:var(--txd)">Objetivo mensual</span>
       <input type="number" class="fib" id="finObjetivo" value="6000" step="100" min="0"
@@ -1230,7 +1231,11 @@ function goTab(id,btn){
   if(id==='gastos')renderFixed();
   if(id==='inv'){renderInv();renderInvSum();renderInvCatBreakdown();}
   if(id==='inicio')loadDashboard();
-  if(id==='finanzas'){finanzasMes=new Date().toISOString().slice(0,7);renderFinanzas();}
+  if(id==='finanzas'){
+    finanzasMes=new Date().toISOString().slice(0,7);
+    if(el('finMes')) el('finMes').value=finanzasMes;
+    renderFinanzas();
+  }
   if(id==='pedidos')renderPedidos();
   if(id==='compra')renderCompra();
   if(id==='clientes')renderClientes();
@@ -3950,6 +3955,78 @@ function renderFinanzasSummary(){
   }
 }
 
+
+// ══ IMPORTAR VENTAS SUMUP → FINANZAS ═══════════════════════
+async function importarVentasSumUp(){
+  const token = getSumUpToken() || localStorage.getItem('pd_su_key') || SU_KEY_DEFAULT;
+  if(!token){ toast('⚙ Conecta SumUp primero en Ajustes'); return; }
+
+  const btn = el('btnFinImport');
+  if(btn){ btn.textContent='⏳ Importando…'; btn.disabled=true; }
+
+  try {
+    // Build date range for selected month
+    const [year, month] = finanzasMes.split('-').map(Number);
+    const fromDate = new Date(year, month-1, 1);
+    const toDate   = new Date(year, month, 0, 23, 59, 59, 999);
+
+    const qs = 'path='+encodeURIComponent('/v0.1/me/transactions/history')
+      +'&oldest_time='+encodeURIComponent(fromDate.toISOString())
+      +'&newest_time='+encodeURIComponent(toDate.toISOString())
+      +'&limit=500&statuses[]=SUCCESSFUL';
+
+    const r = await fetch('/api/sumup?'+qs, { headers:{'x-sumup-key':token} });
+    if(!r.ok){ const e=await r.json().catch(()=>({})); throw new Error(e.message||r.status); }
+
+    const data = await r.json();
+    const items = data.items || data.transactions || [];
+
+    if(!items.length){
+      toast('No hay transacciones de SumUp para este mes');
+      return;
+    }
+
+    // Group by day
+    const d = getMesData();
+    // Reset ventas first (only SumUp column)
+    const byDay = {};
+    items.forEach(t => {
+      const dt  = new Date(t.timestamp || t.local_time);
+      const day = dt.getDate();
+      const amt = parseFloat(t.amount) || 0;
+      if(!byDay[day]) byDay[day] = { ef:0, su:0, on:0, biz:0 };
+      // Assign by payment type
+      const pt = (t.payment_type||'').toUpperCase();
+      if(pt==='CASH')       byDay[day].ef += amt;
+      else if(pt==='CARD')  byDay[day].su += amt;
+      else                  byDay[day].su += amt; // default to SumUp
+    });
+
+    // Update ventas array
+    let updated = 0;
+    d.ventas.forEach(v => {
+      const dayData = byDay[v.dia];
+      if(dayData){
+        v.ef  = Math.round((v.ef||0)  * 100) / 100; // keep existing cash if any
+        v.su  = Math.round(dayData.su * 100) / 100;
+        v.on  = Math.round(dayData.on * 100) / 100;
+        v.biz = Math.round(dayData.biz* 100) / 100;
+        updated++;
+      }
+    });
+
+    saveFinanzas();
+    renderFinanzas();
+    toast(`✓ ${items.length} transacciones importadas en ${updated} días`);
+
+  } catch(e) {
+    toast('❌ Error: ' + e.message);
+    console.error(e);
+  } finally {
+    if(btn){ btn.textContent='📥 Importar desde SumUp'; btn.disabled=false; }
+  }
+}
+
 // ── WIRE UP STATIC HTML EVENT LISTENERS ─────────────────
 document.querySelectorAll('[data-tab]').forEach(btn => {
   btn.addEventListener('click', () => goTab(btn.dataset.tab, btn));
@@ -3972,6 +4049,7 @@ document.querySelectorAll('[data-action="close-drawer"]').forEach(el=>el.addEven
 document.querySelector('[data-action="save-close"]')?.addEventListener('click', ()=>{saveAll();closeEscDrawer();renderRecetas();});
 document.querySelector('[data-action="cancel-drawer"]')?.addEventListener('click', ()=>{closeEscDrawer();renderRecetas();});
 el('btnDashRefresh')?.addEventListener('click', loadDashboard);
+el('btnFinImport')?.addEventListener('click', importarVentasSumUp);
 // Ventas
 el('btnFetchVentas')?.addEventListener('click', fetchVentas);
 el('btnExportVentas')?.addEventListener('click', exportVentasCSV);
